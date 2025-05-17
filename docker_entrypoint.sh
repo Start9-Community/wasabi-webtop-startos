@@ -4,32 +4,6 @@ echo
 echo "Initialising Wasabi on Webtop..."
 echo
 
-export PUID=1000
-export PGID=1000
-export TZ=Etc/UTC
-export TITLE="$(yq e '.title' /root/data/start9/config.yaml)"
-CUSTOM_USER="$(yq e '.username' /root/data/start9/config.yaml)"
-PASSWORD="$(yq e '.password' /root/data/start9/config.yaml)"
-
-cat <<EOF >/root/data/start9/stats.yaml
-version: 2
-data:
-  "UI Username":
-    type: string
-    value: "$CUSTOM_USER"
-    description: "Username for logging into your Webtop."
-    copyable: true
-    qr: false
-    masked: false
-  "UI Password":
-    type: string
-    value: "$PASSWORD"
-    description: "Password for logging into your Webtop."
-    copyable: true
-    qr: false
-    masked: true
-EOF
-
 # Copy default files
 cp /defaults/.backupignore /config/.backupignore
 
@@ -161,7 +135,6 @@ fi
 sed -i '/<script src="public\/js\/pcm-player\.js"><\/script>/d' /kclient/public/index.html
 
 # add '&reconnect=' setting to kclient html
-RECONNECT=$(yq e '.reconnect' /root/data/start9/config.yaml)
 sed -i "s/\(index\.html?autoconnect=1\)/&\&reconnect=$RECONNECT/" /kclient/public/index.html
 
 # hack to disable systemd-inhibit, which Wasabi uses for sleep/shutdown detection
