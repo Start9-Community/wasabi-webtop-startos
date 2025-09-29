@@ -1,4 +1,5 @@
 import { setupManifest } from '@start9labs/start-sdk'
+import { WASABI_VERSION } from './install/versions'
 
 export const manifest = setupManifest({
   id: 'wasabi-webtop',
@@ -20,7 +21,7 @@ export const manifest = setupManifest({
     main: {
       arch: ['x86_64'],
       source: {
-        dockerTag: 'ghcr.io/remcoros/wasabi-webtop:2.7.0',
+        dockerTag: 'ghcr.io/remcoros/wasabi-webtop:' + WASABI_VERSION,
       },
     },
   },

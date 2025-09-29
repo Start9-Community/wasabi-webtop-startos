@@ -1,5 +1,4 @@
 import { sdk } from './sdk'
-import { T } from '@start9labs/start-sdk'
 import {
   ensureFileExists,
   removeUtf8BOMCharacter,
