@@ -25,7 +25,7 @@ jobs:
         env:
           S9DEVKEY: ${{ secrets.S9DEVKEY }}
         run: |
-          start-cli init
+          start-cli init-key
           chmod 600 ~/.startos/developer.key.pem
           
           if [[ -n "$S9DEVKEY" ]]; then

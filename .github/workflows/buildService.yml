@@ -25,7 +25,7 @@ jobs:
       - name: Build the service package
         id: build
         run: |
-          start-cli init
+          start-cli init-key
           chmod 600 ~/.startos/developer.key.pem
 
           RUST_LOG=debug RUST_BACKTRACE=1 make
