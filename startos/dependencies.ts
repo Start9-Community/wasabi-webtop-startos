@@ -28,8 +28,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
     return {
       bitcoind: {        
         kind: 'exists',
-        // @todo update version range
-        versionRange: '>=28.1:3-alpha.4',
+        versionRange: '>=29.1',
       },
     }
   }
