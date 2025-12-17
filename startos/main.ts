@@ -9,7 +9,7 @@ import { store } from './fileModels/store.yaml'
 import { configFile, ConfigFileType } from './fileModels/config.json'
 import { uiConfigFile } from './fileModels/uiConfig.json'
 
-export const main = sdk.setupMain(async ({ effects, started }) => {
+export const main = sdk.setupMain(async ({ effects }) => {
   console.info('setupMain: Setting up Wasabi webtop...')
 
   // setup a watch on the store file for changes (this restarts the service)
@@ -125,7 +125,7 @@ export const main = sdk.setupMain(async ({ effects, started }) => {
   /*
    * Daemons
    */
-  return sdk.Daemons.of(effects, started).addDaemon('primary', {
+  return sdk.Daemons.of(effects).addDaemon('primary', {
     subcontainer: subcontainer,
     exec: {
       command: ['docker_entrypoint.sh'],

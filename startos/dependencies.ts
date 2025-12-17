@@ -1,6 +1,6 @@
 import { store } from './fileModels/store.yaml'
 import { sdk } from './sdk'
-import { config as bitcoinConfig } from 'bitcoind-startos/startos/actions/config/other'
+import { otherConfig as bitcoinConfig } from 'bitcoind-startos/startos/actions/config/other'
 
 export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   const conf = await store.read().const(effects)
