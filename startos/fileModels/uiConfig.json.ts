@@ -19,7 +19,9 @@ const UiConfigShape = object({
 
 export type UiConfigFileType = typeof UiConfigShape._TYPE
 
-export const uiConfigFile = FileHelper.json(
-  '/media/startos/volumes/userdir/.walletwasabi/client/UiConfig.json',
+export const uiConfigFile = FileHelper.json({
+  volumeId: 'userdir',
+  subpath: '.walletwasabi/client/UiConfig.json',
+  },
   UiConfigShape,
 )

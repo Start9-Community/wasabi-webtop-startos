@@ -5,7 +5,7 @@ import { generateRpcPassword } from '../utils'
 import { generateRpcUserDependent } from 'bitcoind-startos/startos/actions/generateRpcUserDependent'
 
 export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
-  var settings = await store.read().const(effects)
+  const settings = await store.read().const(effects)
 
   if (
     settings?.wasabi?.managesettings &&
@@ -33,44 +33,49 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
         { allowWriteAfterConst: true },
       )
     } else {
-      await sdk.mount(effects, {
-        location: '/tmp/bitcoin.conf',
-        target: {
-          packageId: 'bitcoind',
-          readonly: true,
+      await sdk.SubContainer.withTemp(effects, {
+        imageId: 'main',
+      }, sdk.Mounts.of().mountDependency({        
+          dependencyId: 'bitcoind',
           volumeId: 'main',
-          subpath: '/bitcoin.conf',
-          idmap: []
-        },
-      })
-      const bitcoinConf = await bitcoinConfFile
-        .withPath('/tmp/bitcoin.conf')
-        .read()
-        .const(effects)
+          mountpoint: '/mnt/bitcoind',
+          subpath: null,
+          readonly: true,
+          type: 'directory'
+        }), 'read-bitcoind-conf',
+        async (subcontainer) => {
+          const bitcoinConf = await bitcoinConfFile
+            .withPath(`${subcontainer.rootfs}/mnt/bitcoind/bitcoin.conf`)
+            .read()
+            .once()
+          
+          console.log(bitcoinConf)
 
-      const rpcAuth = bitcoinConf?.rpcauth ?? []
-      const users = [rpcAuth].flat().map((e) => e.split(':', 2))
-      const rpcAuthEntry = users.find((e) => e[0] == currentUser)
+          const rpcAuth = bitcoinConf?.rpcauth ?? []
+          const users = [rpcAuth].flat().map((e) => e.split(':', 2))
+          const rpcAuthEntry = users.find((e) => e[0] == currentUser)
 
-      if (!rpcAuthEntry) {
-        await sdk.action.createTask(
-          effects,
-          'bitcoind',
-          generateRpcUserDependent,
-          'important',
-          {
-            replayId: 'request-rpc-credentials',
-            reason: 'Create RPC credentials for Wasabi',
-            input: {
-              kind: 'partial',
-              value: {
-                username: settings.wasabi.server.user,
-                password: settings.wasabi.server.password,
+          if (!rpcAuthEntry) {
+            await sdk.action.createTask(
+              effects,
+              'bitcoind',
+              generateRpcUserDependent,
+              'critical',
+              {
+                replayId: 'request-rpc-credentials',
+                reason: 'Create RPC credentials for Wasabi',
+                input: {
+                  kind: 'partial',
+                  value: {
+                    username: settings!.wasabi.server.user,
+                    password: settings!.wasabi.server.password,
+                  },
+                },
               },
-            },
-          },
-        )
-      }
+            )
+          }
+        }
+      )
     }
   } else {
     sdk.action.clearTask(effects, 'request-rpc-credentials')

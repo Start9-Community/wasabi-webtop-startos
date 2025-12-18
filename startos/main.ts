@@ -84,13 +84,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
     // server config
     if (conf.wasabi.server.type == 'bitcoind') {
-      // get ip of bitcoind container (using hostname does not work currently in Wasabi)
-      // @todo remove when fixed in Wasabi (https://github.com/WalletWasabi/WalletWasabi/pull/13915)
-      const bitcoindIp = await resolveIPv4Address('bitcoind.startos')
       config = {
         ...config,
         UseBitcoinRpc: true,
-        BitcoinRpcEndPoint: `${bitcoindIp}:8332`,
+        BitcoinRpcEndPoint: `bitcoind.startos:8332`,
         BitcoinRpcCredentialString:
           conf.wasabi.server.user + ':' + conf.wasabi.server.password,
       }
@@ -138,6 +135,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
         CUSTOM_USER: conf.username,
         PASSWORD: conf.password,
         RECONNECT: conf.reconnect ? 'true' : 'false',
+        //COMPlus_DbgEnableMiniDump: '1',
       },
     },
     ready: {

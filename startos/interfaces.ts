@@ -3,9 +3,10 @@ import { sdk } from './sdk'
 import { uiPort } from './utils'
 
 export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
-  const uiMulti = sdk.MultiHost.of(effects, 'main')
-  const uiMultiOrigin = await uiMulti.bindPort(uiPort, {
+  const multi = sdk.MultiHost.of(effects, 'main')
+  const uiOrigin = await multi.bindPort(uiPort, {
     protocol: 'http',
+    addSsl: { addXForwardedHeaders: true },
   })
 
   const ui = sdk.createInterface(effects, {
@@ -20,16 +21,16 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
     query: {},
   })
 
-  const uiReceipt = await uiMultiOrigin.export([ui])
+  const uiReceipt = await uiOrigin.export([ui])
   const receipts = [uiReceipt]
 
   const jsonRpcServerEnabled = await store
     .read((f) => f.wasabi.rpc.enable)
     .const(effects)
   if (jsonRpcServerEnabled) {
-    const rpcMulti = sdk.MultiHost.of(effects, 'rpc')
-    const rpcMultiOrigin = await rpcMulti.bindPort(37128, {
+    const rpcOrigin = await multi.bindPort(37128, {
       protocol: 'http',
+      addSsl: { addXForwardedHeaders: true },
     })
     const rpc = sdk.createInterface(effects, {
       name: 'JSON-RPC',
@@ -42,7 +43,8 @@ export const setInterfaces = sdk.setupInterfaces(async ({ effects }) => {
       path: '',
       query: {},
     })
-    const rpcReceipt = await rpcMultiOrigin.export([rpc])
+
+    const rpcReceipt = await rpcOrigin.export([rpc])
     receipts.push(rpcReceipt)
   }
 
