@@ -1,4 +1,5 @@
 import { matches, FileHelper, T } from '@start9labs/start-sdk'
+import { sdk } from '../sdk'
 const { object, boolean, oneOf, literal } = matches
 
 /*
@@ -20,7 +21,7 @@ const UiConfigShape = object({
 export type UiConfigFileType = typeof UiConfigShape._TYPE
 
 export const uiConfigFile = FileHelper.json({
-  volumeId: 'userdir',
+  base: sdk.volumes.userdir,
   subpath: '.walletwasabi/client/UiConfig.json',
   },
   UiConfigShape,

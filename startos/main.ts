@@ -8,6 +8,7 @@ import {
 import { store } from './fileModels/store.yaml'
 import { configFile, ConfigFileType } from './fileModels/config.json'
 import { uiConfigFile } from './fileModels/uiConfig.json'
+import { i18n } from './i18n'
 
 export const main = sdk.setupMain(async ({ effects }) => {
   console.info('setupMain: Setting up Wasabi webtop...')
@@ -16,7 +17,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const conf = (await store.read().const(effects))!
 
   if (!conf.password) {
-    throw new Error('Password is required')
+    throw new Error(i18n('Password is required'))
   }
 
   /*
@@ -139,14 +140,14 @@ export const main = sdk.setupMain(async ({ effects }) => {
       },
     },
     ready: {
-      display: 'Web Interface',
+      display: i18n('Web Interface'),
       fn: () =>
         sdk.healthCheck.checkWebUrl(
           effects,
           'http://wasabi-webtop.startos:' + uiPort,
           {
-            successMessage: 'The web interface is ready',
-            errorMessage: 'The web interface is unreachable',
+            successMessage: i18n('The web interface is ready'),
+            errorMessage: i18n('The web interface is unreachable'),
           },
         ),
     },
