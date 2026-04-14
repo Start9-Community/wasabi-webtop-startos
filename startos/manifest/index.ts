@@ -18,7 +18,8 @@ export const manifest = setupManifest({
       es_ES: 'Wasabi Wallet - La billetera Bitcoin enfocada en privacidad',
       de_DE: 'Wasabi Wallet - Die datenschutzorientierte Bitcoin-Wallet',
       pl_PL: 'Wasabi Wallet - Portfel Bitcoin skupiony na prywatności',
-      fr_FR: 'Wasabi Wallet - Le portefeuille Bitcoin axé sur la confidentialité',
+      fr_FR:
+        'Wasabi Wallet - Le portefeuille Bitcoin axé sur la confidentialité',
     },
     long: {
       en_US:

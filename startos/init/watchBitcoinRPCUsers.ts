@@ -33,26 +33,33 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
         { allowWriteAfterConst: true },
       )
     } else {
-      await sdk.SubContainer.withTemp(effects, {
-        imageId: 'main',
-      }, sdk.Mounts.of().mountDependency({        
+      await sdk.SubContainer.withTemp(
+        effects,
+        {
+          imageId: 'main',
+        },
+        sdk.Mounts.of().mountDependency({
           dependencyId: 'bitcoind',
           volumeId: 'main',
           mountpoint: '/mnt/bitcoind',
           subpath: null,
           readonly: true,
-          type: 'directory'
-        }), 'read-bitcoind-conf',
+          type: 'directory',
+        }),
+        'read-bitcoind-conf',
         async (subcontainer) => {
           const bitcoinConf = await bitcoinConfFile
             .withPath(`${subcontainer.rootfs}/mnt/bitcoind/bitcoin.conf`)
             .read()
             .once()
-          
+
           console.log(bitcoinConf)
 
           const rpcAuth = bitcoinConf?.raw?.rpcauth ?? []
-          const users = [rpcAuth].flat().filter((e): e is string => !!e).map((e) => e.split(':', 2))
+          const users = [rpcAuth]
+            .flat()
+            .filter((e): e is string => !!e)
+            .map((e) => e.split(':', 2))
           const rpcAuthEntry = users.find((e) => e[0] == currentUser)
 
           if (!rpcAuthEntry) {
@@ -74,7 +81,7 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
               },
             )
           }
-        }
+        },
       )
     }
   } else {

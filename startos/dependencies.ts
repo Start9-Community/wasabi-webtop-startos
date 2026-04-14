@@ -8,25 +8,31 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   const managesettings = conf?.wasabi.managesettings
   const serverType = conf?.wasabi.server.type
   if (managesettings && serverType == 'bitcoind') {
-    await sdk.action.createTask(effects, 'bitcoind', bitcoinConfig, 'critical', {
-      replayId: 'request-compact-block-filters',
-      when: {
-        condition: 'input-not-matches',
-        once: false,
-      },
-      reason: 'Enable Compact Block Filters (BIP158) in Bitcoin Core',
-      input: {
-        kind: 'partial',
-        value: {
-          blockfilters: {
-            blockfilterindex: true,
+    await sdk.action.createTask(
+      effects,
+      'bitcoind',
+      bitcoinConfig,
+      'critical',
+      {
+        replayId: 'request-compact-block-filters',
+        when: {
+          condition: 'input-not-matches',
+          once: false,
+        },
+        reason: 'Enable Compact Block Filters (BIP158) in Bitcoin Core',
+        input: {
+          kind: 'partial',
+          value: {
+            blockfilters: {
+              blockfilterindex: true,
+            },
           },
         },
       },
-    })
+    )
 
     return {
-      bitcoind: {        
+      bitcoind: {
         kind: 'exists',
         versionRange: '>=29.1',
       },

@@ -9,7 +9,9 @@ const shape = z.object({
   wasabi: z.object({
     managesettings: z.boolean(),
     server: z.object({
-      type: z.union([z.literal('bitcoind'), z.literal('none')]).catch('bitcoind'),
+      type: z
+        .union([z.literal('bitcoind'), z.literal('none')])
+        .catch('bitcoind'),
       user: z.string(),
       password: z.string(),
     }),
