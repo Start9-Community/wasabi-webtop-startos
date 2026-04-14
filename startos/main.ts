@@ -72,7 +72,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
     subcontainer,
     '/config/.walletwasabi/client/UiConfig.json',
   )
-  uiConfigFile.merge(effects, {
+
+  await uiConfigFile.merge(effects, {
     Oobe: false,
     WindowState: 'FullScreen',
   })
@@ -80,7 +81,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (conf.wasabi.managesettings) {
     let config: Partial<ConfigFileType> = {
       // Update config version so Wasabi will not try to migrate it
-      ConfigVersion: 2,
+      ConfigVersion: 3,
     }
 
     // server config
@@ -117,7 +118,8 @@ export const main = sdk.setupMain(async ({ effects }) => {
       subcontainer,
       '/config/.walletwasabi/client/Config.json',
     )
-    configFile.merge(effects, config)
+
+    await configFile.merge(effects, config)
   }
 
   /*

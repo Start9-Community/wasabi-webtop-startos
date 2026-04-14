@@ -5,7 +5,7 @@ import { generateRpcPassword } from '../utils'
 import { generateRpcUserDependent } from 'bitcoind-startos/startos/actions/generateRpcUserDependent'
 
 export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
-  const settings = await store.read().const(effects)
+  const settings = await store.read(x => x).const(effects)
 
   if (
     settings?.wasabi?.managesettings &&
@@ -52,8 +52,6 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
             .withPath(`${subcontainer.rootfs}/mnt/bitcoind/bitcoin.conf`)
             .read()
             .once()
-
-          console.log(bitcoinConf)
 
           const rpcAuth = bitcoinConf?.raw?.rpcauth ?? []
           const users = [rpcAuth]
