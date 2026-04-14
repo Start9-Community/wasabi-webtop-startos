@@ -51,8 +51,8 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
           
           console.log(bitcoinConf)
 
-          const rpcAuth = bitcoinConf?.rpcauth ?? []
-          const users = [rpcAuth].flat().map((e) => e.split(':', 2))
+          const rpcAuth = bitcoinConf?.raw?.rpcauth ?? []
+          const users = [rpcAuth].flat().filter((e): e is string => !!e).map((e) => e.split(':', 2))
           const rpcAuthEntry = users.find((e) => e[0] == currentUser)
 
           if (!rpcAuthEntry) {

@@ -2,7 +2,9 @@ import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 
 export const v2_7_2 = VersionInfo.of({
   version: '2.7.2:1-beta.1',
-  releaseNotes: 'Update Wasabi to 2.7.2',
+  releaseNotes: {
+    en_US: 'Update Wasabi to 2.7.2',
+  },
   migrations: {
     up: async ({ effects }) => {},
     down: IMPOSSIBLE,

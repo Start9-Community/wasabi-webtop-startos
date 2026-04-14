@@ -1,17 +1,17 @@
 import { setupManifest } from '@start9labs/start-sdk'
-import { WASABI_VERSION } from '../install/versions'
+import { WASABI_VERSION } from '../versions'
 
 export const manifest = setupManifest({
   id: 'wasabi-webtop',
   title: 'Wasabi Wallet',
   license: 'MIT',
-  wrapperRepo: 'https://github.com/remcoros/wasabi-webtop-startos',
+  packageRepo: 'https://github.com/remcoros/wasabi-webtop-startos',
   upstreamRepo: 'https://github.com/remcoros/wasabi-webtop-startos',
-  supportSite: 'https://github.com/WalletWasabi/WalletWasabi/issues',
-  docsUrl:
-    'https://github.com/remcoros/wasabi-webtop-startos/blob/main/instructions.md',
-  marketingSite: 'https://wasabiwallet.io/',
+  marketingUrl: 'https://wasabiwallet.io/',
   donationUrl: 'https://docs.wasabiwallet.io/FAQ/FAQ-Contribution.html',
+  docsUrls: [
+    'https://github.com/remcoros/wasabi-webtop-startos/blob/main/instructions.md',
+  ],
   description: {
     short: {
       en_US: 'Wasabi Wallet - The Privacy focused Bitcoin wallet',

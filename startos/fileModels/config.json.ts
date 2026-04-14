@@ -1,27 +1,26 @@
-import { matches, FileHelper, T } from '@start9labs/start-sdk'
+import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-const { object, string, boolean, oneOf, literal, number, array } = matches
 
 /*
  * Config.json
  */
 
 // not all possible fields of Wasabi config are included, so
-// so do not write a new file, use 'merge' instead
-const ConfigShape = object({
-  EnableGpu: boolean,
-  ConfigVersion: number,
-  UseBitcoinRpc: boolean,
-  BitcoinRpcEndPoint: string,
-  BitcoinRpcCredentialString: string,
-  UseTor: oneOf(literal('Enabled'), literal('Disabled')),
-  JsonRpcServerEnabled: boolean,
-  JsonRpcUser: string,
-  JsonRpcPassword: string,
-  JsonRpcServerPrefixes: array(string),
+// do not write a new file, use 'merge' instead
+const ConfigShape = z.object({
+  EnableGpu: z.boolean(),
+  ConfigVersion: z.number(),
+  UseBitcoinRpc: z.boolean(),
+  BitcoinRpcEndPoint: z.string(),
+  BitcoinRpcCredentialString: z.string(),
+  UseTor: z.union([z.literal('Enabled'), z.literal('Disabled')]),
+  JsonRpcServerEnabled: z.boolean(),
+  JsonRpcUser: z.string(),
+  JsonRpcPassword: z.string(),
+  JsonRpcServerPrefixes: z.array(z.string()),
 })
 
-export type ConfigFileType = typeof ConfigShape._TYPE
+export type ConfigFileType = z.infer<typeof ConfigShape>
 
 export const configFile = FileHelper.json(
   {

@@ -1,29 +1,28 @@
-import { matches, FileHelper, T } from '@start9labs/start-sdk'
+import { FileHelper, T, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
-const { object, string, boolean, oneOf, literal } = matches
 
-const shape = object({
-  title: string,
-  username: string,
-  password: string.optional(),
-  reconnect: boolean.onMismatch(false),
-  wasabi: object({
-    managesettings: boolean,
-    server: object({
-      type: oneOf(literal('bitcoind'), literal('none')).onMismatch('bitcoind'),
-      user: string,
-      password: string,
+const shape = z.object({
+  title: z.string(),
+  username: z.string(),
+  password: z.string().optional(),
+  reconnect: z.boolean().catch(false),
+  wasabi: z.object({
+    managesettings: z.boolean(),
+    server: z.object({
+      type: z.union([z.literal('bitcoind'), z.literal('none')]).catch('bitcoind'),
+      user: z.string(),
+      password: z.string(),
     }),
-    useTor: boolean,
-    rpc: object({
-      enable: boolean,
-      username: string.optional(),
-      password: string.optional(),
+    useTor: z.boolean(),
+    rpc: z.object({
+      enable: z.boolean(),
+      username: z.string().optional(),
+      password: z.string().optional(),
     }),
   }),
 })
 
-export type StoreType = typeof shape._TYPE
+export type StoreType = z.infer<typeof shape>
 
 export const store = FileHelper.yaml(
   {
@@ -69,7 +68,7 @@ export const createDefaultStore = async (effects: T.Effects) => {
       },
       useTor: true,
       rpc: {
-        enable: false
+        enable: false,
       },
     },
   })
