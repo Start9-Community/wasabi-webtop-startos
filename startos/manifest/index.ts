@@ -9,9 +9,6 @@ export const manifest = setupManifest({
   upstreamRepo: 'https://github.com/remcoros/wasabi-webtop-startos',
   marketingUrl: 'https://wasabiwallet.io/',
   donationUrl: 'https://docs.wasabiwallet.io/FAQ/FAQ-Contribution.html',
-  docsUrls: [
-    'https://github.com/remcoros/wasabi-webtop-startos/blob/main/instructions.md',
-  ],
   description: {
     short: {
       en_US: 'Wasabi Wallet - The Privacy focused Bitcoin wallet',
