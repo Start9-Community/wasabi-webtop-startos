@@ -48,6 +48,17 @@ export const main = sdk.setupMain(async ({ effects }) => {
   )
 
   /*
+   * StarOS-specific: fix /dev/dri permissions
+   * StartOS passes DRI devices as root:root, preventing the container user from
+   * opening them. chmod o+rw so selkies can use hardware acceleration.
+   */
+  await subcontainer.exec([
+    'sh',
+    '-c',
+    'ls /dev/dri/* 2>/dev/null | xargs -r chmod o+rw',
+  ])
+
+  /*
    * Wasabi settings
    */
 
@@ -75,7 +86,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   await uiConfigFile.merge(effects, {
     Oobe: false,
-    WindowState: 'FullScreen',
+    WindowState: 'Maximized',
   })
 
   if (conf.wasabi.managesettings) {
@@ -128,7 +139,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   return sdk.Daemons.of(effects).addDaemon('primary', {
     subcontainer: subcontainer,
     exec: {
-      command: ['docker_entrypoint.sh'],
+      command: sdk.useEntrypoint(),
       runAsInit: true, // If true, this daemon will be run as PID 1 in the container.
       env: {
         PUID: '1000',
@@ -137,7 +148,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
         TITLE: conf.title,
         CUSTOM_USER: conf.username,
         PASSWORD: conf.password,
-        RECONNECT: conf.reconnect ? 'true' : 'false',
         //COMPlus_DbgEnableMiniDump: '1',
       },
     },

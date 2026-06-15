@@ -38,8 +38,10 @@ export const manifest = setupManifest({
         dockerTag: 'ghcr.io/remcoros/wasabi-webtop:' + WASABI_VERSION,
       },
       arch: ['x86_64'],
+      nvidiaContainer: true,
     },
   },
+  hardwareAcceleration: true,
   dependencies: {
     bitcoind: {
       description: 'Used to connect to your Bitcoin node.',
