@@ -37,12 +37,6 @@ export const inputSpec = InputSpec.of({
     masked: true,
     minLength: 8,
   }),
-  reconnect: Value.toggle({
-    name: 'Automatically reconnect',
-    description:
-      'Automatically reconnect when the connection to the desktop is lost or the browser tab has been idle for too long.',
-    default: false,
-  }),
   wasabi: Value.object(
     {
       name: 'Wasabi settings',
@@ -162,7 +156,6 @@ async function readSettings(effects: T.Effects): Promise<PartialInputSpec> {
     title: settings.title,
     username: settings.username,
     password: settings.password,
-    reconnect: settings.reconnect,
     wasabi: {
       managesettings: settings.wasabi.managesettings,
       server: {
@@ -183,7 +176,6 @@ async function writeSettings(effects: T.Effects, input: InputSpec) {
     title: input.title,
     username: input.username,
     password: input.password,
-    reconnect: input.reconnect,
     wasabi: {
       managesettings: input.wasabi.managesettings,
       server: {
