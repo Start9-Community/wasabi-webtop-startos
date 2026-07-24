@@ -24,10 +24,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
   const bitcoinRpc =
     conf.wasabi.managesettings && conf.wasabi.server.type === 'bitcoind'
       ? await bridgeAddress(effects, {
-          packageId: 'bitcoind',
-          hostId: rpcHostId,
-          internalPort: rpcPort,
-        }).const()
+        packageId: 'bitcoind',
+        hostId: rpcHostId,
+        internalPort: rpcPort,
+      }).const()
       : null
 
   /*
@@ -100,10 +100,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
   })
 
   if (conf.wasabi.managesettings) {
-    let config: Partial<ConfigFileType> = {
-      // Update config version so Wasabi will not try to migrate it
-      ConfigVersion: 3,
-    }
+    let config: Partial<ConfigFileType> = {}
 
     // server config
     if (conf.wasabi.server.type == 'bitcoind') {
