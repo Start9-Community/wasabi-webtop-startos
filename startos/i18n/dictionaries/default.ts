@@ -6,6 +6,9 @@ const dict = {
   'The web interface is unreachable': 2,
   'Password is required': 3,
   'Web Interface': 4,
+  'Bitcoin Core is unavailable': 5,
+  'Enable Compact Block Filters (BIP158) in Bitcoin Core': 6,
+  'Create RPC credentials for Wasabi': 7,
 
   // interfaces.ts
   'Web UI': 100,

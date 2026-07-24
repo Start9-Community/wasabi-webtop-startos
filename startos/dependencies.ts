@@ -1,6 +1,7 @@
 import { store } from './fileModels/store.yaml'
 import { sdk } from './sdk'
-import { otherConfig as bitcoinConfig } from 'bitcoind-startos/startos/actions/config/other'
+import { otherConfig as bitcoinConfig } from 'bitcoin-core-startos/startos/actions/config/other'
+import { i18n } from './i18n'
 
 export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
   const conf = await store.read().const(effects)
@@ -19,10 +20,17 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
           condition: 'input-not-matches',
           once: false,
         },
-        reason: 'Enable Compact Block Filters (BIP158) in Bitcoin Core',
+        reason: i18n('Enable Compact Block Filters (BIP158) in Bitcoin Core'),
         input: {
           kind: 'partial',
-          value: {
+          accept: [
+            {
+              blockfilters: {
+                blockfilterindex: true,
+              },
+            },
+          ],
+          set: {
             blockfilters: {
               blockfilterindex: true,
             },

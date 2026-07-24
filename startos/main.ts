@@ -1,8 +1,9 @@
 import { sdk } from './sdk'
+import { rpcHostId, rpcPort } from 'bitcoin-core-startos/startos/utils'
 import {
+  bridgeAddress,
   ensureFileExists,
   removeUtf8BOMCharacter,
-  resolveIPv4Address,
   uiPort,
 } from './utils'
 import { store } from './fileModels/store.yaml'
@@ -19,6 +20,15 @@ export const main = sdk.setupMain(async ({ effects }) => {
   if (!conf.password) {
     throw new Error(i18n('Password is required'))
   }
+
+  const bitcoinRpc =
+    conf.wasabi.managesettings && conf.wasabi.server.type === 'bitcoind'
+      ? await bridgeAddress(effects, {
+          packageId: 'bitcoind',
+          hostId: rpcHostId,
+          internalPort: rpcPort,
+        }).const()
+      : null
 
   /*
    * Subcontainer setup
@@ -38,7 +48,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     })
 
   // main subcontainer (the webtop container)
-  const subcontainer = await sdk.SubContainer.of(
+  const subcontainer = await sdk.SubContainer.eager(
     effects,
     {
       imageId: 'main',
@@ -97,10 +107,13 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
     // server config
     if (conf.wasabi.server.type == 'bitcoind') {
+      if (!bitcoinRpc) {
+        throw new Error(i18n('Bitcoin Core is unavailable'))
+      }
       config = {
         ...config,
         UseBitcoinRpc: true,
-        BitcoinRpcEndPoint: `bitcoind.startos:8332`,
+        BitcoinRpcEndPoint: bitcoinRpc,
         BitcoinRpcCredentialString:
           conf.wasabi.server.user + ':' + conf.wasabi.server.password,
       }
@@ -154,14 +167,10 @@ export const main = sdk.setupMain(async ({ effects }) => {
     ready: {
       display: i18n('Web Interface'),
       fn: () =>
-        sdk.healthCheck.checkWebUrl(
-          effects,
-          'http://wasabi-webtop.startos:' + uiPort,
-          {
-            successMessage: i18n('The web interface is ready'),
-            errorMessage: i18n('The web interface is unreachable'),
-          },
-        ),
+        sdk.healthCheck.checkWebUrl(effects, 'http://127.0.0.1:' + uiPort, {
+          successMessage: i18n('The web interface is ready'),
+          errorMessage: i18n('The web interface is unreachable'),
+        }),
     },
     requires: [],
   })

@@ -1,8 +1,7 @@
-import { T } from '@start9labs/start-sdk'
+import { SubContainerEager, T } from '@start9labs/start-sdk'
 import crypto from 'crypto'
 import * as fs from 'node:fs/promises'
-import { promises as dns } from 'dns'
-import { SubContainer } from '@start9labs/start-sdk/package/lib/util/SubContainer'
+import { sdk } from './sdk'
 
 // uiPort
 export const uiPort = 3000
@@ -21,7 +20,11 @@ export const generateRpcPassword = (len = 16) =>
 export async function ensureFileExists<
   Manifest extends T.SDKManifest,
   Effects extends T.Effects,
->(subcontainer: SubContainer<Manifest, Effects>, src: string, dest: string) {
+>(
+  subcontainer: SubContainerEager<Manifest, Effects>,
+  src: string,
+  dest: string,
+) {
   const destPath = `${subcontainer.rootfs}${dest}`
   try {
     await fs.access(destPath, fs.constants.F_OK)
@@ -35,26 +38,6 @@ export async function ensureFileExists<
 }
 
 /*
- * Resolves the IPv4 address of a given hostname.
- * @param hostname - The hostname to resolve.
- * @returns A promise that resolves to the first IPv4 address found for the hostname.
- * @throws An error if no IPv4 address is found or if the resolution fails.
- */
-export async function resolveIPv4Address(hostname: string): Promise<string> {
-  try {
-    const addresses = await dns.resolve4(hostname) // resolves only IPv4 addresses
-    if (addresses.length === 0) {
-      throw new Error(`No IPv4 address found for hostname: ${hostname}`)
-    }
-    return addresses[0]
-  } catch (error) {
-    throw new Error(
-      `Failed to resolve IPv4 address for ${hostname}: ${(error as Error).message}`,
-    )
-  }
-}
-
-/*
  * Removes the UTF-8 BOM character from the beginning of a file.
  * @param subcontainer - The subcontainer in which the file resides.
  * @param filePath - The path to the file from which to remove the BOM character.
@@ -62,6 +45,27 @@ export async function resolveIPv4Address(hostname: string): Promise<string> {
 export async function removeUtf8BOMCharacter<
   Manifest extends T.SDKManifest,
   Effects extends T.Effects,
->(subcontainer: SubContainer<Manifest, Effects>, filePath: string) {
+>(subcontainer: SubContainerEager<Manifest, Effects>, filePath: string) {
   await subcontainer.exec(['sed', '-i', `1s/^\uFEFF//`, filePath])
+}
+
+export function bridgeAddress(
+  effects: T.Effects,
+  opts: { packageId: string; hostId: string; internalPort: number },
+) {
+  const watchable = async () => {
+    const osIp = await sdk.getOsIp(effects)
+    return sdk.host.get(
+      effects,
+      { packageId: opts.packageId, hostId: opts.hostId },
+      (host) => {
+        const port = host?.bindings[opts.internalPort]?.net.assignedPort
+        return port == null ? null : `${osIp}:${port}`
+      },
+    )
+  }
+  return {
+    const: async () => (await watchable()).const(),
+    once: async () => (await watchable()).once(),
+  }
 }

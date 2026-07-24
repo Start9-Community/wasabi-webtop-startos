@@ -1,11 +1,12 @@
-import { bitcoinConfFile } from 'bitcoind-startos/startos/fileModels/bitcoin.conf'
+import { bitcoinConfFile } from 'bitcoin-core-startos/startos/fileModels/bitcoin.conf'
 import { store } from '../fileModels/store.yaml'
 import { sdk } from '../sdk'
 import { generateRpcPassword } from '../utils'
-import { generateRpcUserDependent } from 'bitcoind-startos/startos/actions/generateRpcUserDependent'
+import { generateRpcUserDependent } from 'bitcoin-core-startos/startos/actions/generateRpcUserDependent'
+import { i18n } from '../i18n'
 
 export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
-  const settings = await store.read(x => x).const(effects)
+  const settings = await store.read((x) => x).const(effects)
 
   if (
     settings?.wasabi?.managesettings &&
@@ -68,10 +69,16 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects, kind) => {
               'critical',
               {
                 replayId: 'request-rpc-credentials',
-                reason: 'Create RPC credentials for Wasabi',
+                reason: i18n('Create RPC credentials for Wasabi'),
                 input: {
                   kind: 'partial',
-                  value: {
+                  accept: [
+                    {
+                      username: settings!.wasabi.server.user,
+                      password: settings!.wasabi.server.password,
+                    },
+                  ],
+                  set: {
                     username: settings!.wasabi.server.user,
                     password: settings!.wasabi.server.password,
                   },

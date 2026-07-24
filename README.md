@@ -6,6 +6,8 @@
 
 [Webtop](https://docs.linuxserver.io/images/docker-webtop/) is an innovative Linux desktop environment that allows users to access a complete Linux desktop directly from their web browser. This repository creates the `s9pk` package that is installed to run the [Wasabi desktop wallet](https://wasabiwallet.io/) on a stripped down version of `Webtop` on [StartOS](https://github.com/Start9Labs/start-os/). Learn more about service packaging in the [Developer Docs](https://start9.com/latest/developer-docs/).
 
+When local Bitcoin Core integration is selected, StartOS resolves its live bridge port dynamically; cookie credentials and wallet data remain on their existing mounted volumes.
+
 ## Dependencies
 
 Install the system dependencies below to build this project by following the instructions in the provided links. You can also find detailed steps to setup your environment in the service packaging [documentation](https://docs.start9.com/latest/developer-docs/packaging#development-environment).
