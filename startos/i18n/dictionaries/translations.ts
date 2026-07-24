@@ -7,6 +7,9 @@ export default {
     2: 'La interfaz web no está accesible',
     3: 'Se requiere contraseña',
     4: 'Interfaz web',
+    5: 'Bitcoin Core no está disponible',
+    6: 'Activar los filtros compactos de bloques (BIP158) en Bitcoin Core',
+    7: 'Crear credenciales RPC para Wasabi',
 
     // interfaces.ts
     100: 'Interfaz web',
@@ -22,6 +25,9 @@ export default {
     2: 'Die Weboberfläche ist nicht erreichbar',
     3: 'Passwort ist erforderlich',
     4: 'Weboberfläche',
+    5: 'Bitcoin Core ist nicht verfügbar',
+    6: 'Compact Block Filters (BIP158) in Bitcoin Core aktivieren',
+    7: 'RPC-Zugangsdaten für Wasabi erstellen',
 
     // interfaces.ts
     100: 'Weboberfläche',
@@ -37,6 +43,9 @@ export default {
     2: 'Interfejs webowy jest niedostępny',
     3: 'Wymagane jest hasło',
     4: 'Interfejs webowy',
+    5: 'Bitcoin Core jest niedostępny',
+    6: 'Włącz kompaktowe filtry bloków (BIP158) w Bitcoin Core',
+    7: 'Utwórz dane logowania RPC dla Wasabi',
 
     // interfaces.ts
     100: 'Interfejs webowy',
@@ -52,6 +61,9 @@ export default {
     2: "L'interface web est inaccessible",
     3: 'Mot de passe requis',
     4: 'Interface web',
+    5: 'Bitcoin Core est indisponible',
+    6: 'Activer les filtres de blocs compacts (BIP158) dans Bitcoin Core',
+    7: 'Créer les identifiants RPC pour Wasabi',
 
     // interfaces.ts
     100: 'Interface web',

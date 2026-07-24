@@ -1,9 +1,8 @@
 import { sdk } from '../sdk'
 import { T, utils } from '@start9labs/start-sdk'
 import { createDefaultStore, store } from '../fileModels/store.yaml'
-import { Variants } from '@start9labs/start-sdk/base/lib/actions/input/builder'
 
-const { InputSpec, Value } = sdk
+const { InputSpec, Value, Variants } = sdk
 
 export const inputSpec = InputSpec.of({
   title: Value.text({
@@ -159,7 +158,7 @@ async function readSettings(effects: T.Effects): Promise<PartialInputSpec> {
     wasabi: {
       managesettings: settings.wasabi.managesettings,
       server: {
-        selection: settings.wasabi.server.type,
+        selection: settings.wasabi.server.type as 'bitcoind' | 'none',
       },
       useTor: settings.wasabi.useTor,
       rpc: {

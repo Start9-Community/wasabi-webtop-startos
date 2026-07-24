@@ -1,6 +1,6 @@
 # Wasabi Instructions
 
-Welcome to Wasabi on Webtop, your favourite desktop wallet in an Immutable Linux Desktop, running 24/7 on your Start9 server!
+Welcome to Wasabi on Webtop, your favourite desktop wallet in an Immutable Linux Desktop, running 24/7 on your StartOS server!
 
 ## Initial Configuration
 
@@ -14,27 +14,29 @@ Now your Wasabi on Webtop is ready to be visited in your browser!
 
 ## Important Notes
 
-1. Webtop is an Immutable Linux Desktop environment running in a container. Any changes outside the home directory will **NOT** be persisted and **lost** after a restart and/or update! The home directory (`/config`) is stored outside the container and will be persisted accross restarts and included in StartOS backups. Most applications (like Wasabi and the File Manager) persist their settings in a file or directory in the /config directory, so users can customize the experience a little bit.
+1. Only files and settings saved in your Webtop home folder are kept after a restart or update. Changes elsewhere in the desktop may be lost.
 
-2. Wasabi stores users wallet files, settings and logs in the home directory (`/config/.walletwasabi/`) so they will be available again after a restart or update. They are also included in StartOS backups.
+2. Wasabi keeps your wallet files, settings and logs in its home folder, so they remain available after a restart or update and are included in StartOS backups.
 
-3. Webtop utilizes HTTPS Basic Authentication. When users connect for the first time, their browser will automatically prompt them to log in. Subsequent connections will not require re-entering login credentials, unless the credentials are no longer valid.
+3. If you select local Bitcoin Core in **Settings**, StartOS keeps that connection up to date automatically.
 
-4. This version of Webtop is Debian Linux based. A default configuration for Wasabi is installed if none exist in your user (/config) directory. By default it connects to the installed `bitcoin` instance.
+4. Webtop uses HTTPS Basic Authentication. Your browser asks you to log in on the first visit and remembers the credentials until they change.
 
-5. Wasabi on Webtop does not support camera's or usb devices. Which is something to remember when setting up wallets.
+5. The Webtop desktop is based on Debian Linux. Wasabi creates a default configuration on first start and uses your local Bitcoin node when selected in **Settings**.
+
+6. Wasabi on Webtop does not support cameras or USB devices. Keep this in mind when setting up wallets.
 
 ## Control Panel
 
-By default, you can find the control panel on the left side of the Webtop interface. Webtop uses the KasmVNC client control panel, providing users with various options to control and interact with their session.
+The control panel on the left side of the Webtop interface provides options for controlling and interacting with your session.
 
-For more information about the available settings and functionalities of the control panel, please read the official KasmVNC documentation: [KasmVNC Client Documentation](https://www.kasmweb.com/kasmvnc/docs/latest/clientside.html)
+For more information, see the [KasmVNC Client Documentation](https://www.kasmweb.com/kasmvnc/docs/latest/clientside.html).
 
-## Using the TOR browser
+## Using the Tor Browser
 
-Tor Browser sometimes displays random, multi-colored stripes instead of images, especially when downloading or uploading, due to its defenses against HTML5 Canvas fingerprinting. This feature, while designed to protect user privacy, can interfere with some websites or image uploads. 
+Tor Browser sometimes displays random, multi-colored stripes instead of images, especially when downloading or uploading, as protection against browser fingerprinting. This can interfere with some websites or image uploads.
 
-To resolve this, you can allow the use of canvas on the specific website by clicking the "canvas" icon in the top-left of the URL bar and selecting "Allow".
+To allow images on a website you trust, click the canvas icon in the address bar and select **Allow**.
 
 ## Good Luck!
 
