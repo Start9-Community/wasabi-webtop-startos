@@ -118,7 +118,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
       config = {
         ...config,
         UseBitcoinRpc: false,
-        BitcoinRpcEndPoint: '127.0.0.1:8332',
+        BitcoinRpcEndPoint: '',
         BitcoinRpcCredentialString: '',
       }
     }
@@ -158,7 +158,6 @@ export const main = sdk.setupMain(async ({ effects }) => {
         TITLE: conf.title,
         CUSTOM_USER: conf.username,
         PASSWORD: conf.password,
-        //COMPlus_DbgEnableMiniDump: '1',
       },
     },
     ready: {
