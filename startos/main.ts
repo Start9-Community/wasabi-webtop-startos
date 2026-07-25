@@ -1,11 +1,6 @@
 import { sdk } from './sdk'
 import { rpcHostId, rpcPort } from 'bitcoin-core-startos/startos/utils'
-import {
-  bridgeAddress,
-  ensureFileExists,
-  removeUtf8BOMCharacter,
-  uiPort,
-} from './utils'
+import { ensureFileExists, removeUtf8BOMCharacter, uiPort } from './utils'
 import { store } from './fileModels/store.yaml'
 import { configFile, ConfigFileType } from './fileModels/config.json'
 import { uiConfigFile } from './fileModels/uiConfig.json'
@@ -23,11 +18,14 @@ export const main = sdk.setupMain(async ({ effects }) => {
 
   const bitcoinRpc =
     conf.wasabi.managesettings && conf.wasabi.server.type === 'bitcoind'
-      ? await bridgeAddress(effects, {
-        packageId: 'bitcoind',
-        hostId: rpcHostId,
-        internalPort: rpcPort,
-      }).const()
+      ? await sdk.host
+          .getBridgeAddress(effects, {
+            packageId: 'bitcoind',
+            hostId: rpcHostId,
+            internalPort: rpcPort,
+            ssl: false,
+          })
+          .const()
       : null
 
   /*

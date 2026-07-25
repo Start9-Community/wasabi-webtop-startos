@@ -1,7 +1,6 @@
 import { SubContainerEager, T } from '@start9labs/start-sdk'
 import crypto from 'crypto'
 import * as fs from 'node:fs/promises'
-import { sdk } from './sdk'
 
 // uiPort
 export const uiPort = 3000
@@ -47,25 +46,4 @@ export async function removeUtf8BOMCharacter<
   Effects extends T.Effects,
 >(subcontainer: SubContainerEager<Manifest, Effects>, filePath: string) {
   await subcontainer.exec(['sed', '-i', `1s/^\uFEFF//`, filePath])
-}
-
-export function bridgeAddress(
-  effects: T.Effects,
-  opts: { packageId: string; hostId: string; internalPort: number },
-) {
-  const watchable = async () => {
-    const osIp = await sdk.getOsIp(effects)
-    return sdk.host.get(
-      effects,
-      { packageId: opts.packageId, hostId: opts.hostId },
-      (host) => {
-        const port = host?.bindings[opts.internalPort]?.net.assignedPort
-        return port == null ? null : `${osIp}:${port}`
-      },
-    )
-  }
-  return {
-    const: async () => (await watchable()).const(),
-    once: async () => (await watchable()).once(),
-  }
 }
