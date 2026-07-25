@@ -3,18 +3,18 @@ import { IMPOSSIBLE, VersionInfo } from '@start9labs/start-sdk'
 export const WASABI_VERSION = '2.8.1'
 
 export const current = VersionInfo.of({
-  version: '2.8.1:0',
+  version: '2.8.1:1',
   releaseNotes: {
     en_US:
-      'Update Wasabi to 2.8.1',
+      'Updates Start SDK to 2.0.9, deduplicates SDK copies in package dependencies, and resolves connected service addresses more reliably.',
     es_ES:
-      'Actualiza Wasabi a 2.8.1.',
+      'Actualiza Start SDK a 2.0.9, elimina copias duplicadas del SDK en las dependencias del paquete y resuelve de forma más fiable las direcciones de los servicios conectados.',
     de_DE:
-      'Aktualisiert Wasabi auf 2.8.1.',
+      'Aktualisiert das Start SDK auf 2.0.9, entfernt doppelte SDK-Kopien in den Paketabhängigkeiten und ermittelt die Adressen verbundener Dienste zuverlässiger.',
     pl_PL:
-      'Aktualizuje Wasabi do 2.8.1.',
+      'Aktualizuje Start SDK do wersji 2.0.9, usuwa zduplikowane kopie SDK z zależności pakietu i pewniej ustala adresy połączonych usług.',
     fr_FR:
-      'Met à jour Wasabi vers 2.8.1.',
+      'Met à jour Start SDK vers la version 2.0.9, déduplique les copies du SDK dans les dépendances du paquet et détermine plus fiablement les adresses des services connectés.',
   },
   migrations: {
     up: async () => {},
