@@ -1,11 +1,22 @@
 import { setupManifest } from '@start9labs/start-sdk'
 import { WASABI_VERSION } from '../versions'
 
+const bitcoindDescription = {
+  en_US: 'Used to fetch blocks and broadcast transactions privately.',
+  es_ES:
+    'Se utiliza para obtener bloques y transmitir transacciones de forma privada.',
+  de_DE:
+    'Wird verwendet, um Blöcke abzurufen und Transaktionen privat zu senden.',
+  pl_PL: 'Używany do pobierania bloków i prywatnego rozgłaszania transakcji.',
+  fr_FR:
+    'Utilisé pour récupérer les blocs et diffuser les transactions de manière privée.',
+}
+
 export const manifest = setupManifest({
   id: 'wasabi-webtop',
   title: 'Wasabi Wallet',
   license: 'MIT',
-  packageRepo: 'https://github.com/remcoros/wasabi-webtop-startos',
+  packageRepo: 'https://github.com/Start9-Community/wasabi-webtop-startos',
   upstreamRepo: 'https://github.com/WalletWasabi/WalletWasabi',
   marketingUrl: 'https://wasabiwallet.io/',
   donationUrl: 'https://docs.wasabiwallet.io/FAQ/FAQ-Contribution.html',
@@ -44,11 +55,11 @@ export const manifest = setupManifest({
   hardwareAcceleration: true,
   dependencies: {
     bitcoind: {
-      description: 'Used to connect to your Bitcoin node.',
+      description: bitcoindDescription,
       optional: true,
       metadata: {
-        title: 'A Bitcoin Full Node',
-        icon: 'https://bitcoin.org/img/icons/opengraph.png',
+        title: 'Bitcoin',
+        icon: 'https://raw.githubusercontent.com/Start9Labs/bitcoin-core-startos/feec0b1dae42961a257948fe39b40caf8672fce1/dep-icon.svg',
       },
     },
   },

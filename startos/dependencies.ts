@@ -20,7 +20,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
           condition: 'input-not-matches',
           once: false,
         },
-        reason: i18n('Enable Compact Block Filters (BIP158) in Bitcoin Core'),
+        reason: i18n('Enable Compact Block Filters (BIP158) in Bitcoin'),
         input: {
           kind: 'partial',
           accept: [
@@ -42,7 +42,7 @@ export const setDependencies = sdk.setupDependencies(async ({ effects }) => {
     return {
       bitcoind: {
         kind: 'exists',
-        versionRange: '>=29.1',
+        versionRange: '>=28.4:14',
       },
     }
   }

@@ -1,5 +1,6 @@
 import { FileHelper, T, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
+import { generateRpcPassword } from '../utils'
 
 const shape = z.object({
   title: z.string(),
@@ -11,14 +12,14 @@ const shape = z.object({
       type: z
         .union([z.literal('bitcoind'), z.literal('none')])
         .catch('bitcoind'),
-      user: z.string(),
-      password: z.string(),
+      user: z.string().catch(''),
+      password: z.string().catch(''),
     }),
     useTor: z.boolean(),
     rpc: z.object({
       enable: z.boolean(),
-      username: z.string().optional(),
-      password: z.string().optional(),
+      username: z.string().catch('wasabi'),
+      password: z.string().catch(''),
     }),
   }),
 })
@@ -34,27 +35,7 @@ export const store = FileHelper.yaml(
 )
 
 export const createDefaultStore = async (effects: T.Effects) => {
-  // check if the file exists (from previous installs or upgrades)
-  const conf = await store.read().once()
-  if (conf) {
-    console.log('Wasabi config file already exists, clearing RPC credentials')
-    await store.merge(effects, {
-      wasabi: {
-        server: {
-          user: '',
-          password: '',
-        },
-      },
-    })
-    return
-  }
-
-  // config file does not exist, create it
-  console.log('Wasabi config file does not exist, creating it')
   const installedPackages = await effects.getInstalledPackages()
-  const serverType = installedPackages.includes('bitcoind')
-    ? 'bitcoind'
-    : 'none'
 
   await store.write(effects, {
     title: 'Wasabi Wallet on StartOS',
@@ -62,13 +43,15 @@ export const createDefaultStore = async (effects: T.Effects) => {
     wasabi: {
       managesettings: true,
       server: {
-        type: serverType,
+        type: installedPackages.includes('bitcoind') ? 'bitcoind' : 'none',
         user: '',
         password: '',
       },
       useTor: true,
       rpc: {
         enable: false,
+        username: 'wasabi',
+        password: generateRpcPassword(20),
       },
     },
   })
