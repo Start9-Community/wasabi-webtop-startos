@@ -1,12 +1,7 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-/*
- * UiConfig.json
- */
-
-// not all possible fields of Wasabi config are included, so
-// do not write a new file, use 'merge' instead
+// Wasabi owns every other key in this file, so only ever `merge` — never `write`.
 const UiConfigShape = z.object({
   Oobe: z.boolean(),
   WindowState: z.union([

@@ -1,16 +1,12 @@
 import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
-/*
- * Config.json
- */
-
-// not all possible fields of Wasabi config are included, so
-// do not write a new file, use 'merge' instead
+// Wasabi owns every other key in this file, so only ever `merge` — never `write`.
+// Keys absent here survive the round trip untouched.
 const ConfigShape = z.object({
-  EnableGpu: z.boolean(),
   ConfigVersion: z.number(),
-  UseBitcoinRpc: z.boolean(),
+  // Wasabi's schema has no "use RPC" flag: a non-empty endpoint is what enables
+  // it, and the endpoint must be an absolute URI.
   BitcoinRpcEndPoint: z.string(),
   BitcoinRpcCredentialString: z.string(),
   UseTor: z.union([z.literal('Enabled'), z.literal('Disabled')]),

@@ -7,13 +7,10 @@
   },
   "dependencies": {
     "@start9labs/start-sdk": "2.0.9",
-    "bitcoin-core-startos": "github:Start9Labs/bitcoin-core-startos#31.x",
-    "js-yaml": "^4.1.1",
-    "tor-startos": "github:Start9Labs/tor-startos#master"
+    "bitcoin-core-startos": "github:Start9Labs/bitcoin-core-startos#next/28.x"
   },
   "devDependencies": {
     "@types/node": "^22.19.17",
-    "@types/js-yaml": "^4.0.9",
     "@vercel/ncc": "^0.38.4",
     "prettier": "^3.8.2",
     "typescript": "^6.0.3"

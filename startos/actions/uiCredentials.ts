@@ -1,4 +1,5 @@
 import { store } from '../fileModels/store.yaml'
+import { i18n } from '../i18n'
 import { sdk } from '../sdk'
 
 export const uiCredentials = sdk.Action.withoutInput(
@@ -6,33 +7,30 @@ export const uiCredentials = sdk.Action.withoutInput(
   'ui-credentials',
 
   // metadata
-  async ({ effects }) => {
-    var conf = await store.read().const(effects)
-    return {
-      name: 'Show UI Credentials',
-      description: 'Show the credentials for the web UI.',
-      warning: null,
-      allowedStatuses: 'any',
-      group: 'Configuration',
-      visibility: conf ? 'enabled' : 'hidden',
-    }
-  },
+  async ({ effects }) => ({
+    name: i18n('Show UI Credentials'),
+    description: i18n('Show the username and password for the desktop.'),
+    warning: null,
+    allowedStatuses: 'any',
+    group: i18n('Configuration'),
+    visibility: (await store.read().const(effects)) ? 'enabled' : 'hidden',
+  }),
 
   // execution function
   async ({ effects }) => {
-    var conf = (await store.read().const(effects))!
+    const conf = (await store.read().const(effects))!
 
     return {
       version: '1',
-      title: 'Web UI Credentials',
+      title: i18n('Web UI Credentials'),
       message: null,
       result: {
         type: 'group',
         value: [
           {
             type: 'single',
-            name: 'Username',
-            description: 'Username for the web UI',
+            name: i18n('Username'),
+            description: i18n('Username for the desktop'),
             value: conf.username,
             copyable: true,
             masked: false,
@@ -40,8 +38,8 @@ export const uiCredentials = sdk.Action.withoutInput(
           },
           {
             type: 'single',
-            name: 'Password',
-            description: 'Password for the web UI',
+            name: i18n('Password'),
+            description: i18n('Password for the desktop'),
             value: conf.password || '',
             copyable: true,
             masked: true,

@@ -1,22 +1,22 @@
 import { sdk } from '../sdk'
 import { T, utils } from '@start9labs/start-sdk'
 import { createDefaultStore, store } from '../fileModels/store.yaml'
+import { i18n } from '../i18n'
 
 const { InputSpec, Value, Variants } = sdk
 
 export const inputSpec = InputSpec.of({
   title: Value.text({
-    name: 'Webtop Title',
-    description:
-      'This value will be displayed as the title of your browser tab.',
+    name: i18n('Browser Tab Title'),
+    description: i18n('Shown as the title of the browser tab.'),
     required: true,
     default: 'Wasabi Wallet on StartOS',
     placeholder: 'Wasabi Wallet on StartOS',
     patterns: [utils.Patterns.ascii],
   }),
   username: Value.text({
-    name: 'Username',
-    description: 'The username for logging into your Webtop.',
+    name: i18n('Username'),
+    description: i18n('The username for logging into the desktop.'),
     required: true,
     default: 'webtop',
     placeholder: '',
@@ -24,13 +24,10 @@ export const inputSpec = InputSpec.of({
     patterns: [utils.Patterns.ascii],
   }),
   password: Value.text({
-    name: 'Password',
-    description: 'The password for logging into your Webtop.',
+    name: i18n('Password'),
+    description: i18n('The password for logging into the desktop.'),
     required: true,
-    generate: {
-      charset: 'a-z,0-9',
-      len: 20,
-    },
+    generate: { charset: 'a-z,0-9', len: 20 },
     default: { charset: 'a-z,0-9', len: 20 },
     placeholder: '',
     masked: true,
@@ -38,74 +35,68 @@ export const inputSpec = InputSpec.of({
   }),
   wasabi: Value.object(
     {
-      name: 'Wasabi settings',
-      description: 'Wasabi settings',
+      name: i18n('Wasabi Settings'),
+      description: i18n('How Wasabi connects to Bitcoin and to the network.'),
     },
     InputSpec.of({
       managesettings: Value.toggle({
-        name: 'Apply settings on startup',
-        description:
-          'Disable to manage your own server and proxy settings in Wasabi',
+        name: i18n('Apply Settings On Startup'),
+        description: i18n(
+          'Disable to manage the server and proxy settings inside Wasabi instead. While enabled, the settings below are re-applied every time the service starts.',
+        ),
         default: true,
       }),
-      server: Value.dynamicUnion(async ({ effects }) => {
-        // determine default server type and disabled options
-        const installedPackages = await effects.getInstalledPackages()
-        let serverType: 'bitcoind' | 'none' = installedPackages.includes(
-          'bitcoind',
-        )
+      server: Value.dynamicUnion(async ({ effects }) => ({
+        name: i18n('Bitcoin Node'),
+        description: i18n('The Bitcoin node Wasabi fetches blocks from.'),
+        default: (await effects.getInstalledPackages()).includes('bitcoind')
           ? 'bitcoind'
-          : 'none'
-
-        return {
-          name: 'Bitcoin Node',
-          description: 'The Bitcoin node to connect to',
-          default: serverType,
-          disabled: false,
-          variants: Variants.of({
-            bitcoind: {
-              name: 'Local Node (recommended)',
-              spec: InputSpec.of({}),
-            },
-            none: {
-              name: 'None (not recommended)',
-              spec: InputSpec.of({}),
-            },
-          }),
-        }
-      }),
+          : 'none',
+        disabled: false,
+        variants: Variants.of({
+          bitcoind: {
+            name: i18n('Local Node (recommended)'),
+            spec: InputSpec.of({}),
+          },
+          none: {
+            name: i18n('None (not recommended)'),
+            spec: InputSpec.of({}),
+          },
+        }),
+      })),
       useTor: Value.toggle({
-        name: 'Use Tor',
-        description: 'Configure Wasabi to use the Tor network',
+        name: i18n('Use Tor'),
+        description: i18n("Route Wasabi's own traffic over the Tor network."),
         default: true,
       }),
       rpc: Value.object(
         {
-          name: 'RPC Server settings',
-          description: 'Wasabi Json-RPC server settings.',
+          name: i18n('JSON-RPC Server'),
+          description: i18n(
+            "Wasabi's JSON-RPC API, for driving wallets programmatically.",
+          ),
         },
         InputSpec.of({
           enable: Value.toggle({
-            name: 'Enable RPC',
-            description: 'Enable the Wasabi JSON-RPC server',
+            name: i18n('Enable JSON-RPC'),
+            description: i18n(
+              'Publishes a JSON-RPC interface protected by the credentials below.',
+            ),
             default: false,
           }),
           username: Value.text({
-            name: 'RPC Username',
-            description: 'The username for the Wasabi JSON-RPC server',
+            name: i18n('JSON-RPC Username'),
+            description: i18n('The username for the JSON-RPC server.'),
             required: true,
             default: 'wasabi',
             placeholder: '',
             patterns: [utils.Patterns.ascii],
           }),
           password: Value.text({
-            name: 'Password',
-            description: 'Password for the JSON-RPC server.',
+            name: i18n('JSON-RPC Password'),
+            description: i18n('The password for the JSON-RPC server.'),
             required: true,
-            generate: {
-              charset: 'a-z,0-9',
-              len: 20,
-            },
+            generate: { charset: 'a-z,0-9', len: 20 },
             default: { charset: 'a-z,0-9', len: 20 },
             placeholder: '',
             masked: true,
@@ -123,11 +114,11 @@ export const config = sdk.Action.withInput(
 
   // metadata
   async ({ effects }) => ({
-    name: 'Settings',
-    description: 'Username/password and connection settings',
+    name: i18n('Settings'),
+    description: i18n('Desktop credentials and Bitcoin connection settings'),
     warning: null,
     allowedStatuses: 'any',
-    group: 'Configuration',
+    group: i18n('Configuration'),
     visibility: 'enabled',
   }),
 
@@ -157,9 +148,7 @@ async function readSettings(effects: T.Effects): Promise<PartialInputSpec> {
     password: settings.password,
     wasabi: {
       managesettings: settings.wasabi.managesettings,
-      server: {
-        selection: settings.wasabi.server.type as 'bitcoind' | 'none',
-      },
+      server: { selection: settings.wasabi.server.type },
       useTor: settings.wasabi.useTor,
       rpc: {
         enable: settings.wasabi.rpc.enable,
@@ -177,9 +166,7 @@ async function writeSettings(effects: T.Effects, input: InputSpec) {
     password: input.password,
     wasabi: {
       managesettings: input.wasabi.managesettings,
-      server: {
-        type: input.wasabi.server.selection,
-      },
+      server: { type: input.wasabi.server.selection },
       useTor: input.wasabi.useTor,
       rpc: {
         enable: input.wasabi.rpc.enable,

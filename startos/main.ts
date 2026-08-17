@@ -1,15 +1,18 @@
 import { sdk } from './sdk'
 import { rpcHostId, rpcPort } from 'bitcoin-core-startos/startos/utils'
-import { ensureFileExists, removeUtf8BOMCharacter, uiPort } from './utils'
+import {
+  ensureFileExists,
+  jsonRpcPort,
+  removeUtf8BOMCharacter,
+  uiPort,
+  wasabiConfigVersion,
+} from './utils'
 import { store } from './fileModels/store.yaml'
 import { configFile, ConfigFileType } from './fileModels/config.json'
 import { uiConfigFile } from './fileModels/uiConfig.json'
 import { i18n } from './i18n'
 
 export const main = sdk.setupMain(async ({ effects }) => {
-  console.info('setupMain: Setting up Wasabi webtop...')
-
-  // setup a watch on the store file for changes (this restarts the service)
   const conf = (await store.read().const(effects))!
 
   if (!conf.password) {
@@ -28,50 +31,34 @@ export const main = sdk.setupMain(async ({ effects }) => {
           .const()
       : null
 
-  /*
-   * Subcontainer setup
-   */
-  let mounts = sdk.Mounts.of()
-    .mountVolume({
-      volumeId: 'main',
-      subpath: null,
-      mountpoint: '/root/data',
-      readonly: false,
-    })
-    .mountVolume({
-      volumeId: 'userdir',
-      subpath: null,
-      mountpoint: '/config',
-      readonly: false,
-    })
-
-  // main subcontainer (the webtop container)
   const subcontainer = await sdk.SubContainer.eager(
     effects,
-    {
-      imageId: 'main',
-    },
-    mounts,
+    { imageId: 'main' },
+    sdk.Mounts.of()
+      .mountVolume({
+        volumeId: 'main',
+        subpath: null,
+        mountpoint: '/root/data',
+        readonly: false,
+      })
+      .mountVolume({
+        volumeId: 'userdir',
+        subpath: null,
+        mountpoint: '/config',
+        readonly: false,
+      }),
     'main',
   )
 
-  /*
-   * StarOS-specific: fix /dev/dri permissions
-   * StartOS passes DRI devices as root:root, preventing the container user from
-   * opening them. chmod o+rw so selkies can use hardware acceleration.
-   */
+  // StartOS binds DRI devices into the container as root:root, so the
+  // unprivileged desktop user cannot open them without this.
   await subcontainer.exec([
     'sh',
     '-c',
     'ls /dev/dri/* 2>/dev/null | xargs -r chmod o+rw',
   ])
 
-  /*
-   * Wasabi settings
-   */
-
-  // create default config files if they do not exist
-  await ensureFileExists(
+  const seededConfig = await ensureFileExists(
     subcontainer,
     '/defaults/.walletwasabi/client/Config.json',
     '/config/.walletwasabi/client/Config.json',
@@ -82,73 +69,62 @@ export const main = sdk.setupMain(async ({ effects }) => {
     '/config/.walletwasabi/client/UiConfig.json',
   )
 
-  // set permissions to the webtop user
   await subcontainer.exec(['chown', '-R', '1000:1000', '/config'])
 
-  // Force windowstate to full-screen. We used to do this through the openbox rc.xml
-  // config, but this causes graphical glitches in Wasabi.
   await removeUtf8BOMCharacter(
     subcontainer,
     '/config/.walletwasabi/client/UiConfig.json',
   )
+  await removeUtf8BOMCharacter(
+    subcontainer,
+    '/config/.walletwasabi/client/Config.json',
+  )
 
+  // Maximized rather than openbox's fullscreen, which glitches Wasabi's canvas.
   await uiConfigFile.merge(effects, {
     Oobe: false,
     WindowState: 'Maximized',
   })
 
-  if (conf.wasabi.managesettings) {
-    let config: Partial<ConfigFileType> = {}
+  // The seed claims schema 3 but omits the BackendUri that Wasabi's schema-3
+  // decoder requires, so no decoder matches and Wasabi silently discards the
+  // whole file for its own defaults — taking the settings below with it, and
+  // leaving the wallet syncing over public peers. Relabelling the seed is the
+  // repair: its body is already a valid schema 4.
+  if (seededConfig) {
+    await configFile.merge(effects, { ConfigVersion: wasabiConfigVersion })
+  }
 
-    // server config
-    if (conf.wasabi.server.type == 'bitcoind') {
-      if (!bitcoinRpc) {
-        throw new Error(i18n('Bitcoin Core is unavailable'))
-      }
-      config = {
-        ...config,
-        UseBitcoinRpc: true,
-        BitcoinRpcEndPoint: bitcoinRpc,
-        BitcoinRpcCredentialString:
-          conf.wasabi.server.user + ':' + conf.wasabi.server.password,
-      }
-    } else if (conf.wasabi.server.type == 'none') {
-      config = {
-        ...config,
-        UseBitcoinRpc: false,
-        BitcoinRpcEndPoint: '',
-        BitcoinRpcCredentialString: '',
-      }
+  if (conf.wasabi.managesettings) {
+    if (conf.wasabi.server.type === 'bitcoind' && !bitcoinRpc) {
+      throw new Error(i18n('Bitcoin is unavailable'))
     }
 
-    config = {
-      ...config,
-      // Tor
+    const server: Partial<ConfigFileType> = bitcoinRpc
+      ? {
+          BitcoinRpcEndPoint: `http://${bitcoinRpc}`,
+          BitcoinRpcCredentialString: `${conf.wasabi.server.user}:${conf.wasabi.server.password}`,
+        }
+      : {
+          BitcoinRpcEndPoint: '',
+          BitcoinRpcCredentialString: '',
+        }
+
+    await configFile.merge(effects, {
+      ...server,
       UseTor: conf.wasabi.useTor ? 'Enabled' : 'Disabled',
-      // JSON RPC server
       JsonRpcServerEnabled: conf.wasabi.rpc.enable,
       JsonRpcUser: conf.wasabi.rpc.username,
       JsonRpcPassword: conf.wasabi.rpc.password,
-      JsonRpcServerPrefixes: ['http://+:37128/'],
-    }
-
-    // merge with existing config file
-    await removeUtf8BOMCharacter(
-      subcontainer,
-      '/config/.walletwasabi/client/Config.json',
-    )
-
-    await configFile.merge(effects, config)
+      JsonRpcServerPrefixes: [`http://+:${jsonRpcPort}/`],
+    })
   }
 
-  /*
-   * Daemons
-   */
   return sdk.Daemons.of(effects).addDaemon('primary', {
-    subcontainer: subcontainer,
+    subcontainer,
     exec: {
       command: sdk.useEntrypoint(),
-      runAsInit: true, // If true, this daemon will be run as PID 1 in the container.
+      runAsInit: true,
       env: {
         PUID: '1000',
         PGID: '1000',
@@ -161,7 +137,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     ready: {
       display: i18n('Web Interface'),
       fn: () =>
-        sdk.healthCheck.checkWebUrl(effects, 'http://127.0.0.1:' + uiPort, {
+        sdk.healthCheck.checkWebUrl(effects, `http://127.0.0.1:${uiPort}`, {
           successMessage: i18n('The web interface is ready'),
           errorMessage: i18n('The web interface is unreachable'),
         }),
