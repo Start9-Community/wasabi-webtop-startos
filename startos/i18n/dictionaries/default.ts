@@ -21,7 +21,7 @@ const dict = {
 
   // actions/config.ts
   Settings: 200,
-  'Desktop credentials and Bitcoin connection settings': 201,
+  'Desktop credentials, rendering, and Bitcoin connection settings': 201,
   Configuration: 202,
   'Browser Tab Title': 203,
   'Shown as the title of the browser tab.': 204,
@@ -47,6 +47,10 @@ const dict = {
   'The username for the JSON-RPC server.': 224,
   'JSON-RPC Password': 225,
   'The password for the JSON-RPC server.': 226,
+  'Enable Wayland': 227,
+  'Use the Wayland desktop backend. Disable this for the older X11 compatibility backend. Force Software Rendering takes precedence and uses X11.': 228,
+  'Force Software Rendering': 229,
+  'Use the CPU-only X11 compatibility path without graphics devices. Enable this if the Web UI is blank or unstable because of incompatible graphics hardware. This overrides Enable Wayland, is slower, and takes effect after restart.': 230,
 
   // actions/uiCredentials.ts
   'Show UI Credentials': 300,
