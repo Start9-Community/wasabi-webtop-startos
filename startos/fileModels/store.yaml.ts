@@ -6,6 +6,8 @@ const shape = z.object({
   title: z.string(),
   username: z.string(),
   password: z.string().optional(),
+  enableWayland: z.boolean().catch(true),
+  forceSoftwareRendering: z.boolean().catch(false),
   wasabi: z.object({
     managesettings: z.boolean(),
     server: z.object({
@@ -40,6 +42,8 @@ export const createDefaultStore = async (effects: T.Effects) => {
   await store.write(effects, {
     title: 'Wasabi Wallet on StartOS',
     username: 'webtop',
+    enableWayland: true,
+    forceSoftwareRendering: false,
     wasabi: {
       managesettings: true,
       server: {

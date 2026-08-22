@@ -33,7 +33,11 @@ The Web UI is the whole desktop, not just Wasabi. Wasabi starts maximized and is
 
 ### Settings
 
-**Settings** is where the desktop's username and password live, along with the choice of Bitcoin node, the Tor toggle, and the JSON-RPC server. Changes take effect the next time the service starts, so restart it afterwards.
+**Settings** is where the desktop's username and password live, along with the rendering mode, choice of Bitcoin node, Tor toggle, and JSON-RPC server. Changes take effect the next time the service starts, so restart it afterwards.
+
+Leave **Enable Wayland** on and **Force Software Rendering** off for normal hardware-accelerated operation. You can turn **Enable Wayland** off to use the older X11 desktop backend while retaining normal graphics-device detection.
+
+If the Web UI stays blank, flickers, or crashes because the server or virtual machine exposes incompatible graphics hardware, turn **Force Software Rendering** on and restart the service. It takes precedence over **Enable Wayland** and uses the CPU-only X11 compatibility path. This is slower but avoids incompatible GPU paths. It does not change Wasabi's wallet or Bitcoin settings.
 
 While **Apply Settings On Startup** is on, this page owns Wasabi's connection settings — the Bitcoin node, the Tor setting and the RPC server — and rewrites them every time the service starts. If you would rather set those inside Wasabi itself, turn that toggle off and they are yours.
 
