@@ -4,6 +4,7 @@ Wasabi is a desktop application, not a web app. What you open in your browser is
 
 ## Documentation
 
+- [Start9 Bitcoin Guides](https://docs.start9.com/bitcoin-guides/) — connecting a wallet to your own Bitcoin node or Electrum server, and which wallets work on which platforms.
 - [Wasabi documentation](https://docs.wasabiwallet.io/) — the official user guide.
 - [Wasabi FAQ](https://docs.wasabiwallet.io/FAQ/) — answers to the questions most people have first.
 - [Coinjoin](https://docs.wasabiwallet.io/using-wasabi/CoinJoin.html) — how Wasabi's privacy feature works and what it costs.
