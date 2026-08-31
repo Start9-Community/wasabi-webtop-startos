@@ -22,7 +22,7 @@ export default {
 
     // actions/config.ts
     200: 'Ajustes',
-    201: 'Credenciales del escritorio y ajustes de conexión con Bitcoin',
+    201: 'Credenciales del escritorio, renderizado y ajustes de conexión con Bitcoin',
     202: 'Configuración',
     203: 'Título de la pestaña del navegador',
     204: 'Se muestra como título de la pestaña del navegador.',
@@ -48,6 +48,10 @@ export default {
     224: 'El nombre de usuario del servidor JSON-RPC.',
     225: 'Contraseña JSON-RPC',
     226: 'La contraseña del servidor JSON-RPC.',
+    227: 'Activar Wayland',
+    228: 'Usa el backend de escritorio Wayland. Desactívalo para usar el backend de compatibilidad X11 más antiguo. Forzar renderizado por software tiene prioridad y usa X11.',
+    229: 'Forzar renderizado por software',
+    230: 'Usa la ruta de compatibilidad X11 solo con la CPU y sin dispositivos gráficos. Actívala si la interfaz web está en blanco o es inestable debido a hardware gráfico incompatible. Esta opción anula Activar Wayland, es más lenta y se aplica después de reiniciar.',
 
     // actions/uiCredentials.ts
     300: 'Mostrar las credenciales de la interfaz',
@@ -77,7 +81,7 @@ export default {
 
     // actions/config.ts
     200: 'Einstellungen',
-    201: 'Desktop-Zugangsdaten und Bitcoin-Verbindungseinstellungen',
+    201: 'Desktop-Zugangsdaten, Darstellung und Bitcoin-Verbindungseinstellungen',
     202: 'Konfiguration',
     203: 'Titel des Browser-Tabs',
     204: 'Wird als Titel des Browser-Tabs angezeigt.',
@@ -103,6 +107,10 @@ export default {
     224: 'Der Benutzername des JSON-RPC-Servers.',
     225: 'JSON-RPC-Passwort',
     226: 'Das Passwort des JSON-RPC-Servers.',
+    227: 'Wayland aktivieren',
+    228: 'Verwendet das Wayland-Desktop-Backend. Deaktivieren Sie diese Option für das ältere X11-Kompatibilitäts-Backend. Software-Rendering erzwingen hat Vorrang und verwendet X11.',
+    229: 'Software-Rendering erzwingen',
+    230: 'Verwendet den reinen CPU-X11-Kompatibilitätspfad ohne Grafikgeräte. Aktivieren Sie diese Option, wenn die Weboberfläche wegen inkompatibler Grafikhardware leer oder instabil ist. Sie überschreibt Wayland aktivieren, ist langsamer und wird nach einem Neustart wirksam.',
 
     // actions/uiCredentials.ts
     300: 'Zugangsdaten der Weboberfläche anzeigen',
@@ -132,7 +140,7 @@ export default {
 
     // actions/config.ts
     200: 'Ustawienia',
-    201: 'Dane logowania do pulpitu i ustawienia połączenia z Bitcoinem',
+    201: 'Dane logowania do pulpitu, renderowanie i ustawienia połączenia z Bitcoinem',
     202: 'Konfiguracja',
     203: 'Tytuł karty przeglądarki',
     204: 'Wyświetlany jako tytuł karty przeglądarki.',
@@ -158,6 +166,10 @@ export default {
     224: 'Nazwa użytkownika serwera JSON-RPC.',
     225: 'Hasło JSON-RPC',
     226: 'Hasło serwera JSON-RPC.',
+    227: 'Włącz Wayland',
+    228: 'Używa backendu pulpitu Wayland. Wyłącz tę opcję, aby użyć starszego backendu zgodności X11. Wymuszenie renderowania programowego ma pierwszeństwo i używa X11.',
+    229: 'Wymuś renderowanie programowe',
+    230: 'Używa wyłącznie procesora i ścieżki zgodności X11 bez urządzeń graficznych. Włącz tę opcję, jeśli interfejs webowy jest pusty lub niestabilny z powodu niezgodnego sprzętu graficznego. Zastępuje ona opcję Włącz Wayland, jest wolniejsza i zaczyna działać po ponownym uruchomieniu.',
 
     // actions/uiCredentials.ts
     300: 'Pokaż dane logowania interfejsu',
@@ -187,7 +199,7 @@ export default {
 
     // actions/config.ts
     200: 'Paramètres',
-    201: 'Identifiants du bureau et paramètres de connexion à Bitcoin',
+    201: 'Identifiants du bureau, rendu et paramètres de connexion à Bitcoin',
     202: 'Configuration',
     203: "Titre de l'onglet du navigateur",
     204: "Affiché comme titre de l'onglet du navigateur.",
@@ -213,6 +225,10 @@ export default {
     224: "Le nom d'utilisateur du serveur JSON-RPC.",
     225: 'Mot de passe JSON-RPC',
     226: 'Le mot de passe du serveur JSON-RPC.',
+    227: 'Activer Wayland',
+    228: "Utilise le backend de bureau Wayland. Désactivez cette option pour utiliser l'ancien backend de compatibilité X11. Forcer le rendu logiciel est prioritaire et utilise X11.",
+    229: 'Forcer le rendu logiciel',
+    230: "Utilise le chemin de compatibilité X11 uniquement avec le processeur et sans périphérique graphique. Activez cette option si l'interface web est vide ou instable à cause d'un matériel graphique incompatible. Elle remplace Activer Wayland, est plus lente et prend effet après un redémarrage.",
 
     // actions/uiCredentials.ts
     300: "Afficher les identifiants de l'interface",

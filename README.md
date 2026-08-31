@@ -49,11 +49,21 @@ One image, pulled rather than built. It is a community-maintained image that lay
 | `main`               | The `primary` daemon — the desktop, and the one to `attach` to          |
 | `read-bitcoind-conf` | Short-lived, during init only; reads Bitcoin's `bitcoin.conf` read-only |
 
-The manifest sets `hardwareAcceleration`, so StartOS binds whatever GPU device nodes the host has (`/dev/dri`, `/dev/nvidia*`, `/dev/kfd`) into the container; the desktop uses them if they are there and falls back to software rendering if not. It also sets `nvidiaContainer` on the image, which layers the host's NVIDIA userspace driver over the image on an NVIDIA-flavored StartOS install. On any other host that flag is a silent no-op — the overlay simply does not exist, and the package runs unchanged.
+The manifest sets `hardwareAcceleration`, so StartOS binds whatever GPU device nodes the host has (`/dev/dri`, `/dev/nvidia*`, `/dev/kfd`) into the container. **Enable Wayland** selects the image's modern Wayland backend and defaults to on; turning it off selects the older X11 backend without otherwise disabling GPU use. A present but incompatible device can prevent automatic fallback and leave the Web UI blank or unstable. **Force Software Rendering** is the compatibility override for that case: it takes precedence over **Enable Wayland**, selects X11, disables DRI3/Zink application acceleration and automatic GPU selection, and forces and locks Selkies CPU video encoding. Software Wayland is deliberately not selected because Wasabi and the bundled file manager are X11 applications, and their Xwayland windows render black when the Wayland stack has no usable graphics device.
 
-StartOS binds those device nodes as root, so `main.ts` relaxes the mode on `/dev/dri/*` before starting the daemon; without it the unprivileged desktop user cannot open them.
+Software mode uses supported controls rather than a fake device path: `AUTO_GPU=false` suppresses the image's automatic GPU mode, `SELKIES_USE_CPU=true|locked` forces and locks CPU video encoding, and `DISABLE_DRI3=true` plus `DISABLE_ZINK=true` disable the X11 GPU paths. `LIBGL_ALWAYS_SOFTWARE=true` also forces Mesa software rendering for applications. This pinned image can still populate `DRI_NODE` internally when exactly one render node is present, but the locked CPU encoder does not use it. The device nodes remain visible because hardware access is a static manifest capability.
 
-The daemon receives `PUID`/`PGID` (both `1000`), `TZ`, and three values from the package's own settings: `TITLE` (the browser tab title), `CUSTOM_USER`, and `PASSWORD`. The last two are the desktop's HTTP Basic Auth credentials and are read fresh on every start, so changing them in **Settings** takes effect on the next restart.
+| Enable Wayland | Force Software Rendering | Effective desktop path |
+| --- | --- | --- |
+| On | Off | Wayland with automatic GPU selection |
+| Off | Off | X11 with normal GPU detection |
+| On or off | On | CPU-only X11 compatibility mode |
+
+The manifest also sets `nvidiaContainer` on the image, which layers the host's NVIDIA userspace driver over the image on an NVIDIA-flavored StartOS install. On any other host that flag is a silent no-op — the overlay simply does not exist, and the package runs unchanged.
+
+StartOS binds those device nodes as root, so `main.ts` relaxes the mode on `/dev/dri/*` before starting a hardware-enabled daemon; without it the unprivileged desktop user cannot open them. It deliberately skips that step in forced-software mode.
+
+The daemon receives `PUID`/`PGID` (both `1000`), `TZ`, `PIXELFLUX_WAYLAND`, and three values from the package's own settings: `TITLE` (the browser tab title), `CUSTOM_USER`, and `PASSWORD`. When **Force Software Rendering** is enabled it also receives the software-path environment described above; otherwise those variables are absent and the image chooses its normal renderer and encoder. The credentials and rendering choices are read fresh on every start, so changing them in **Settings** takes effect on the next restart.
 
 ## Volume and Data Layout
 
@@ -78,7 +88,7 @@ Three files, one owned outright by the package and two shared with Wasabi. The s
 | `.walletwasabi/client/Config.json`   | `userdir` | Shared — some keys re-asserted every start, the rest are Wasabi's |
 | `.walletwasabi/client/UiConfig.json` | `userdir` | Shared — two keys re-asserted every start, the rest are Wasabi's  |
 
-`start9/config.yaml` holds the desktop title, username and password, the Bitcoin-node choice, the Tor toggle, the JSON-RPC settings, and the Bitcoin RPC credential the package generated for itself. It is the source of truth for everything the package asserts elsewhere, and it is what makes those decisions survive a restart.
+`start9/config.yaml` holds the desktop title, username and password, the Wayland and software-rendering toggles, the Bitcoin-node choice, the Tor toggle, the JSON-RPC settings, and the Bitcoin RPC credential the package generated for itself. It is the source of truth for everything the package asserts elsewhere, and it is what makes those decisions survive a restart. Existing settings files without the rendering keys migrate to Wayland enabled and software rendering disabled.
 
 Both Wasabi files are seeded once, on first start, by copying the image's `/defaults` copies into `/config` if they are not already there. After that they belong to Wasabi — except for the keys below.
 
@@ -130,7 +140,7 @@ Wasabi's own onboarding wizard is suppressed — the package sets `Oobe` to fals
 
 Two, both user-facing, both in a **Configuration** group.
 
-**Settings** (`config`) — the only way to configure the package. Run it to set the desktop's browser-tab title, username and password; to choose between a local Bitcoin node and none; to toggle Tor; and to enable Wasabi's JSON-RPC server. It writes only the package's own settings file; nothing reaches Wasabi until the next start, so **restart the service for a change to take effect**. It is safe to run repeatedly and takes no meaningful time. Changing the node selection re-derives the dependency and the tasks on Bitcoin's page.
+**Settings** (`config`) — the only way to configure the package. Run it to set the desktop's browser-tab title, username and password; to select Wayland or X11 and optionally force the CPU-only X11 compatibility path; to choose between a local Bitcoin node and none; to toggle Tor; and to enable Wasabi's JSON-RPC server. It writes only the package's own settings file; nothing reaches Wasabi until the next start, so **restart the service for a change to take effect**. It is safe to run repeatedly and takes no meaningful time. Changing the node selection re-derives the dependency and the tasks on Bitcoin's page.
 
 **Show UI Credentials** (`ui-credentials`) — read-only; returns the desktop username and password, the password masked and both copyable. Run it when the browser has forgotten the Basic Auth prompt or you need to hand the login to someone. It changes nothing. It is hidden until **Settings** has been run at least once, because there is nothing to show before that.
 
@@ -204,6 +214,12 @@ startos_managed_env_vars:
   - TITLE
   - CUSTOM_USER
   - PASSWORD
+  - PIXELFLUX_WAYLAND # false when Enable Wayland is off or software rendering is forced
+  - AUTO_GPU # false only while Force Software Rendering is enabled
+  - SELKIES_USE_CPU # true|locked only while Force Software Rendering is enabled
+  - DISABLE_DRI3 # true only while Force Software Rendering is enabled
+  - DISABLE_ZINK # true only while Force Software Rendering is enabled
+  - LIBGL_ALWAYS_SOFTWARE # true only while Force Software Rendering is enabled
 dependencies:
   - bitcoind # optional; only when the node selection is "Local Node"
 interfaces:

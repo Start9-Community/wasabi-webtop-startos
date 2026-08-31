@@ -33,6 +33,20 @@ export const inputSpec = InputSpec.of({
     masked: true,
     minLength: 8,
   }),
+  enableWayland: Value.toggle({
+    name: i18n('Enable Wayland'),
+    description: i18n(
+      'Use the Wayland desktop backend. Disable this for the older X11 compatibility backend. Force Software Rendering takes precedence and uses X11.',
+    ),
+    default: true,
+  }),
+  forceSoftwareRendering: Value.toggle({
+    name: i18n('Force Software Rendering'),
+    description: i18n(
+      'Use the CPU-only X11 compatibility path without graphics devices. Enable this if the Web UI is blank or unstable because of incompatible graphics hardware. This overrides Enable Wayland, is slower, and takes effect after restart.',
+    ),
+    default: false,
+  }),
   wasabi: Value.object(
     {
       name: i18n('Wasabi Settings'),
@@ -115,7 +129,9 @@ export const config = sdk.Action.withInput(
   // metadata
   async ({ effects }) => ({
     name: i18n('Settings'),
-    description: i18n('Desktop credentials and Bitcoin connection settings'),
+    description: i18n(
+      'Desktop credentials, rendering, and Bitcoin connection settings',
+    ),
     warning: null,
     allowedStatuses: 'any',
     group: i18n('Configuration'),
@@ -146,6 +162,8 @@ async function readSettings(effects: T.Effects): Promise<PartialInputSpec> {
     title: settings.title,
     username: settings.username,
     password: settings.password,
+    enableWayland: settings.enableWayland,
+    forceSoftwareRendering: settings.forceSoftwareRendering,
     wasabi: {
       managesettings: settings.wasabi.managesettings,
       server: { selection: settings.wasabi.server.type },
@@ -164,6 +182,8 @@ async function writeSettings(effects: T.Effects, input: InputSpec) {
     title: input.title,
     username: input.username,
     password: input.password,
+    enableWayland: input.enableWayland,
+    forceSoftwareRendering: input.forceSoftwareRendering,
     wasabi: {
       managesettings: input.wasabi.managesettings,
       server: { type: input.wasabi.server.selection },
