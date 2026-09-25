@@ -71,7 +71,7 @@ export const main = sdk.setupMain(async ({ effects }) => {
     '/config/.walletwasabi/client/UiConfig.json',
   )
 
-  await subcontainer.exec(['chown', '-R', '1000:1000', '/config'])
+  await subcontainer.exec(['chown', '-R', '1000:1000', '/config'], {}, null)
 
   await removeUtf8BOMCharacter(
     subcontainer,
