@@ -38,11 +38,11 @@ Wasabi Wallet is a privacy-focused Bitcoin desktop wallet. It has no web interfa
 
 One image, pulled rather than built. It is a community-maintained image that layers Wasabi and an openbox desktop onto LinuxServer's Selkies base, and it is built in its own repository — **nothing in this repository can change what is inside the container.**
 
-| Property      | Value                                          |
-| ------------- | ---------------------------------------------- |
-| Image         | `ghcr.io/remcoros/wasabi-webtop`               |
-| Architectures | x86_64 only; emulated as x86_64 on other hosts |
-| Entrypoint    | The image's own, via `useEntrypoint`           |
+| Property      | Value                                   |
+| ------------- | --------------------------------------- |
+| Image         | `ghcr.io/remcoros/wasabi-webtop`        |
+| Architectures | x86_64 only; not offered on other hosts |
+| Entrypoint    | The image's own, via `useEntrypoint`    |
 
 | Subcontainer         | Purpose                                                                 |
 | -------------------- | ----------------------------------------------------------------------- |
@@ -108,7 +108,7 @@ One, and it is optional — Wasabi will run against its own network backend if y
 | ---------- | -------- | ------------------------------------------ | ---------------------------------------------------------- |
 | `bitcoind` | Optional | `main` volume, read-only, during init only | Fetch blocks and broadcast transactions over your own node |
 
-The dependency is only declared when **Settings** has both "Apply Settings On Startup" enabled and the Bitcoin node set to "Local Node"; select "None" and it disappears. There is no health-check gate — the package resolves Bitcoin's RPC bridge address at startup and fails to start if it cannot, rather than waiting on Bitcoin to be synced.
+The dependency is only enabled when **Settings** has both "Apply Settings On Startup" enabled and the Bitcoin node set to "Local Node"; otherwise it is not a current dependency. It accepts Bitcoin 28.4:29, 29.4:16, 30.3:16 or 31.1:16 or later on its major line, or Bitcoin Knots (pre-RDTS) 29.3:29 or later. There is no health-check gate — the package resolves Bitcoin's RPC bridge address at startup and fails to start if it cannot, rather than waiting on Bitcoin to be synced.
 
 The read-only mount exists for one purpose: to read `bitcoin.conf` and check whether the RPC user this package generated for itself has been registered on the Bitcoin side yet. Nothing is ever written through it.
 
@@ -123,7 +123,7 @@ Two interfaces, one of which only exists when you ask for it.
 
 The Web UI is the desktop itself and is protected by HTTP Basic Auth using the username and password from **Settings** — the browser prompts on first visit. Neither interface is masked.
 
-The JSON-RPC interface is only published while "Enable JSON-RPC" is on. Note that it is the package's **Settings** action that widens Wasabi's RPC listener from loopback to all interfaces, and it only does that while "Apply Settings On Startup" is on; with that toggle off, the interface is published but Wasabi is still listening on loopback only, and you must widen it yourself inside Wasabi.
+The JSON-RPC interface is only published while "Enable JSON-RPC" is on. It is bound on the `main` host. The StartOS 0.3.5 version of this package exposed JSON-RPC on a separate `rpc` host; updating to `2.8.2:3` retires that host and frees its ports, and its addresses (an `.onion` or a domain) are not carried over to the JSON-RPC interface. Note that it is the package's **Settings** action that widens Wasabi's RPC listener from loopback to all interfaces, and it only does that while "Apply Settings On Startup" is on; with that toggle off, the interface is published but Wasabi is still listening on loopback only, and you must widen it yourself inside Wasabi.
 
 ## Installation and First-Run Flow
 
@@ -154,7 +154,7 @@ Three, all `critical` — the package raises one on itself and two on Bitcoin's 
 | Create RPC credentials for Wasabi | Bitcoin          | Bitcoin's `bitcoin.conf` has no `rpcauth` entry for the username this package generated | Running Bitcoin's credential action from the task |
 | Enable Compact Block Filters      | Bitcoin          | Bitcoin's `blockfilterindex` setting is off                                             | Turning it on in Bitcoin's **Other Settings**     |
 
-The two Bitcoin tasks only exist while the node selection is "Local Node"; switching to "None" clears both. They can return — the credential task comes back if the `rpcauth` entry is later removed, and the block-filter task re-raises whenever the setting is turned back off, because it re-checks rather than firing once.
+The two Bitcoin tasks only apply while the node selection is "Local Node". Switching to "None" clears the credential task, and StartOS hides the block-filter task so it no longer blocks anything; it returns if "Local Node" is selected again and the setting is still off. They can return — the credential task comes back if the `rpcauth` entry is later removed, and the block-filter task re-raises whenever the setting is turned back off, because it re-checks rather than firing once.
 
 The credential task supplies both the username and the password and renders them read-only, so the user cannot edit them. Bitcoin refuses a password shorter than its own floor, which is why this package rotates a too-short credential itself before raising the task rather than raising one the user could never submit.
 
@@ -180,7 +180,7 @@ A restored instance is usable immediately: the same desktop credentials, the sam
 
 ## Limitations and Differences
 
-1. **x86_64 only in practice.** The image is not built for aarch64 or riscv64, and the manifest leaves the default emulation fallback in place, so those hosts run it emulated — a full desktop under emulation is not a usable experience.
+1. **x86_64 only.** The image is not built for aarch64 or riscv64, and the manifest sets `emulateMissing: false`, so the package is not offered on those hosts — a full desktop under emulation is not a usable experience.
 2. **No USB, so no hardware wallets.** Nothing is passed through to the container, so Coldcard, Trezor, Ledger and friends cannot be used. This is the single biggest difference from running Wasabi on a laptop.
 3. **No camera**, so QR codes cannot be scanned — paste instead.
 4. **One session.** The desktop is a single X session; opening the Web UI in a second browser attaches to the same one rather than starting another.
@@ -221,7 +221,7 @@ startos_managed_env_vars:
   - DISABLE_ZINK # true only while Force Software Rendering is enabled
   - LIBGL_ALWAYS_SOFTWARE # true only while Force Software Rendering is enabled
 dependencies:
-  - bitcoind # optional; only when the node selection is "Local Node"
+  - bitcoind # optional; enabled only when the node selection is "Local Node"
 interfaces:
   ui: { type: ui, port: 3000 }
   rpc: { type: api, port: 37128 } # only while JSON-RPC is enabled

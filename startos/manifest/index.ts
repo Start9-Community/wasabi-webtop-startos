@@ -1,17 +1,6 @@
 import { setupManifest } from '@start9labs/start-sdk'
 import { WASABI_VERSION } from '../versions'
 
-const bitcoindDescription = {
-  en_US: 'Used to fetch blocks and broadcast transactions privately.',
-  es_ES:
-    'Se utiliza para obtener bloques y transmitir transacciones de forma privada.',
-  de_DE:
-    'Wird verwendet, um Blöcke abzurufen und Transaktionen privat zu senden.',
-  pl_PL: 'Używany do pobierania bloków i prywatnego rozgłaszania transakcji.',
-  fr_FR:
-    'Utilisé pour récupérer les blocs et diffuser les transactions de manière privée.',
-}
-
 export const manifest = setupManifest({
   id: 'wasabi-webtop',
   title: 'Wasabi Wallet',
@@ -49,18 +38,9 @@ export const manifest = setupManifest({
         dockerTag: 'ghcr.io/remcoros/wasabi-webtop:' + WASABI_VERSION,
       },
       arch: ['x86_64'],
+      emulateMissing: false,
       nvidiaContainer: true,
     },
   },
   hardwareAcceleration: true,
-  dependencies: {
-    bitcoind: {
-      description: bitcoindDescription,
-      optional: true,
-      metadata: {
-        title: 'Bitcoin',
-        icon: 'https://raw.githubusercontent.com/Start9Labs/bitcoin-core-startos/feec0b1dae42961a257948fe39b40caf8672fce1/dep-icon.svg',
-      },
-    },
-  },
 })

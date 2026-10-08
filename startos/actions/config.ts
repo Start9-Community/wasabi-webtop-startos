@@ -8,7 +8,7 @@ const { InputSpec, Value, Variants } = sdk
 export const inputSpec = InputSpec.of({
   title: Value.text({
     name: i18n('Browser Tab Title'),
-    description: i18n('Shown as the title of the browser tab.'),
+    description: null,
     required: true,
     default: 'Wasabi Wallet on StartOS',
     placeholder: 'Wasabi Wallet on StartOS',
@@ -62,7 +62,9 @@ export const inputSpec = InputSpec.of({
       }),
       server: Value.dynamicUnion(async ({ effects }) => ({
         name: i18n('Bitcoin Node'),
-        description: i18n('The Bitcoin node Wasabi fetches blocks from.'),
+        description: i18n(
+          '- Local Node: Wasabi fetches blocks and broadcasts transactions through the Bitcoin service on this server.\n- None: Wasabi synchronizes from public Bitcoin peers instead.',
+        ),
         default: (await effects.getInstalledPackages()).includes('bitcoind')
           ? 'bitcoind'
           : 'none',
@@ -100,7 +102,7 @@ export const inputSpec = InputSpec.of({
           }),
           username: Value.text({
             name: i18n('JSON-RPC Username'),
-            description: i18n('The username for the JSON-RPC server.'),
+            description: null,
             required: true,
             default: 'wasabi',
             placeholder: '',
@@ -108,7 +110,7 @@ export const inputSpec = InputSpec.of({
           }),
           password: Value.text({
             name: i18n('JSON-RPC Password'),
-            description: i18n('The password for the JSON-RPC server.'),
+            description: null,
             required: true,
             generate: { charset: 'a-z,0-9', len: 20 },
             default: { charset: 'a-z,0-9', len: 20 },

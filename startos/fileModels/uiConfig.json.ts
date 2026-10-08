@@ -2,7 +2,7 @@ import { FileHelper, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 
 // Wasabi owns every other key in this file, so only ever `merge` — never `write`.
-const UiConfigShape = z.object({
+const UiConfigShape = z.looseObject({
   Oobe: z.boolean(),
   WindowState: z.union([
     z.literal('Normal'),

@@ -3,7 +3,7 @@ import { sdk } from '../sdk'
 
 // Wasabi owns every other key in this file, so only ever `merge` — never `write`.
 // Keys absent here survive the round trip untouched.
-const ConfigShape = z.object({
+const ConfigShape = z.looseObject({
   ConfigVersion: z.number(),
   // Wasabi's schema has no "use RPC" flag: a non-empty endpoint is what enables
   // it, and the endpoint must be an absolute URI.
