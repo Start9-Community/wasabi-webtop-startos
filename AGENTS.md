@@ -18,17 +18,23 @@ Freshly scaffolded? Work the
 guide page, not a file in this repo — read it, don't copy it in.
 
 Keep `README.md` (technical reference for an AI support or administering agent) and
-`instructions.md` (end-user docs) in sync with your changes.
+`instructions.md` (end-user docs) in sync with your changes. This file restates neither:
+whoever changes the package has both, so it carries only what they don't — repo mechanics,
+a change that looks right and is not, where the next thing gets added, a naming trap, a
+build or test invocation particular to this repo.
 
-**Bugs and feature requests are GitHub issues on this repo** — file them as you find them.
+**Fix a defect you spot rather than reporting it** — you have the package open and the
+context to be sure. File **a GitHub issue on this repo** only when the call isn't yours to
+make: you can't pin the cause down, two defensible fixes exist, or it's too large to ride on
+the work in hand. An open issue is a report, not a queue — implement one when you're asked
+to or when it's labelled `Approved`, then close it with `Closes #<n>`.
+
 Don't record work in the repo instead: no `TODO.md`, no `NOTES.md`, no `PLAN.md`. What you
 verified, tried, and decided belongs in the commit message and the PR body.
 
 ## This repo
 
-- **The image is built elsewhere and this repo only pulls it.** `ghcr.io/remcoros/wasabi-webtop` is built from <https://github.com/remcoros/wasabi-webtop>, which owns the Dockerfile, the LinuxServer-style `/root` overlay, the openbox config, and the `/defaults/.walletwasabi` seed files this package copies at startup. There is no Dockerfile here, so nothing in this repo can change what is inside the container — a change to the desktop, the autostart script, or the seed config is a PR against that repo and a new tag here.
-- **Two volumes, and only one of them holds the wallet.** `userdir` is `/config`, the desktop user's home, and everything Wasabi owns lives under `/config/.walletwasabi` — keys, wallet files, coin labels. `main` holds nothing but this package's own `start9/config.yaml`. Both are backed up; never move wallet state off `userdir`.
-- **`bitcoin-core-startos` is imported as a value, not just a type.** `otherConfig` and `generateRpcUserDependent` are Action objects, so their input specs ship inside `javascript.squashfs`. Read the `package-lock.json` diff of a sibling bump as code review, not a version bump, and keep the pin's line (`next/28.x`) matching the `versionRange` floor in `startos/dependencies.ts`.
-- **Bitcoin's `generate-rpc-dependent` action enforces `minLength: 20` on the password and renders it read-only.** A credential we generate shorter than that produces a critical task the user cannot complete. `rpcPasswordLength` in `startos/utils.ts` is that floor; `watchBitcoinRPCUsers` rotates a below-floor password before raising the task rather than after.
-- **The image seeds `Config.json` with the wrong schema number, and Wasabi's response is to throw the file away.** It claims `ConfigVersion: 3` while its body is a valid schema 4. Wasabi's schema-3 decoder requires a `BackendUri` the seed omits and its schema-4 decoder refuses anything not labelled 4, so every decoder in `PersistentConfigManager.LoadFile`'s `OneOf` fails, the catch-all fires, and it writes `DefaultMainNetConfig` over the top — discarding the Bitcoin RPC settings and leaving the wallet syncing over public peers with a green health check. `main.ts` relabels the seed to `wasabiConfigVersion`; **re-check that constant against upstream on every version bump**, since a real schema 5 with a real migration must not be relabelled away.
-- **Wasabi's config has no `UseBitcoinRpc` flag.** That key was dropped in 2.8.0; a non-empty `BitcoinRpcEndPoint` is what enables RPC, and it must be an **absolute URI** (`http://host:port`) — a bare `host:port` is what upstream's own migration treats as unconfigured.
+- **Change the desktop, its autostart or the seed config in [remcoros/wasabi-webtop](https://github.com/remcoros/wasabi-webtop), then bump the tag here** — this repo has no Dockerfile and only pulls `ghcr.io/remcoros/wasabi-webtop`.
+- **Review a `bitcoin-core-startos` bump's `package-lock.json` diff as code** — `otherConfig` and `generateRpcUserDependent` are imported as values and ship in the bundle. Keep the pin's line (`next/28.x`) matching the 28.x floor of the `versionRange` in `startos/dependencies.ts`.
+- **Keep `rpcPasswordLength` at Bitcoin's `generate-rpc-dependent` floor of 20** — that action renders the password read-only, so a shorter one raises a task the user cannot complete.
+- **Re-check `wasabiConfigVersion` against upstream's `PersistentConfigManager.DefaultMainNetConfig` on every version bump** — a real schema change must not be relabelled away by the seed repair in `main.ts`.

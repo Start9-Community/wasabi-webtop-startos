@@ -48,7 +48,7 @@ Shows the desktop's username and password, ready to copy. Use it if your browser
 
 ### JSON-RPC
 
-Turning on **Enable JSON-RPC** in Settings publishes a second interface for driving Wasabi from scripts, protected by the RPC username and password you set there. Most people do not need it.
+Turning on **Enable JSON-RPC** in Settings publishes a second interface for driving Wasabi from scripts, protected by the RPC username and password you set there. Most people do not need it. An address you reached JSON-RPC through on StartOS 0.3.5 does not carry over: add one to the **JSON-RPC** interface.
 
 ## Limitations
 

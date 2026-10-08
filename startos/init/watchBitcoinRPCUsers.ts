@@ -50,7 +50,6 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects) => {
       mountpoint: '/mnt/bitcoind',
       subpath: null,
       readonly: true,
-      type: 'directory',
     }),
     'read-bitcoind-conf',
     async (subcontainer) => {

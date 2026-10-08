@@ -2,15 +2,15 @@ import { FileHelper, T, z } from '@start9labs/start-sdk'
 import { sdk } from '../sdk'
 import { generateRpcPassword } from '../utils'
 
-const shape = z.object({
+const shape = z.looseObject({
   title: z.string(),
   username: z.string(),
   password: z.string().optional(),
   enableWayland: z.boolean().catch(true),
   forceSoftwareRendering: z.boolean().catch(false),
-  wasabi: z.object({
+  wasabi: z.looseObject({
     managesettings: z.boolean(),
-    server: z.object({
+    server: z.looseObject({
       type: z
         .union([z.literal('bitcoind'), z.literal('none')])
         .catch('bitcoind'),
@@ -18,7 +18,7 @@ const shape = z.object({
       password: z.string().catch(''),
     }),
     useTor: z.boolean(),
-    rpc: z.object({
+    rpc: z.looseObject({
       enable: z.boolean(),
       username: z.string().catch('wasabi'),
       password: z.string().catch(''),
