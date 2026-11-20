@@ -57,13 +57,15 @@ export const watchBitcoinRPCUsers = sdk.setupOnInit(async (effects) => {
     return
   }
 
-  // Re-runs whenever Bitcoin (re)starts and its RPC port comes up, so a node
-  // reinstalled or reset without Wasabi's credential is caught without a restart.
+  // Pruned Bitcoin exposes bridge RPC through `proxy`, not `bitcoind`.
   const rpcReadySince = await utils.Watchable.combine(
     effects,
     [sdk.getStatus(effects, { packageId: 'bitcoind' })],
     ([status]) =>
-      status?.health['bitcoind']?.result === 'success' ? status.started : null,
+      status?.health['bitcoind']?.result === 'success' &&
+      (!status.health['proxy'] || status.health['proxy'].result === 'success')
+        ? status.started
+        : null,
   ).const()
   const rpcAddress = await sdk.host
     .getBridgeAddress(effects, {
